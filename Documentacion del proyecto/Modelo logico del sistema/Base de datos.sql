@@ -1,0 +1,181 @@
+/*==============================================================*/
+/* DBMS name:      PostgreSQL 9.x                               */
+/* Created on:     26/9/2025 16:03:18                           */
+/*==============================================================*/
+
+---
+-- CREACIÓN DE TABLAS CON CLAVES PRIMARIAS SERIAL
+---
+
+/*==============================================================*/
+/* Table: ESTADO_SOLICITUD                                      */
+/*==============================================================*/
+CREATE TABLE ESTADO_SOLICITUD (
+    IDESTADOSOLICITUD      SERIAL         NOT NULL,
+    ESTADOSOLICITUD        CHAR(10)       NOT NULL,
+    CONSTRAINT PK_ESTADO_SOLICITUD PRIMARY KEY (IDESTADOSOLICITUD)
+);
+
+/*==============================================================*/
+/* Table: ESTADO_TICKET                                         */
+/*==============================================================*/
+CREATE TABLE ESTADO_TICKET (
+    IDESTADOTICKET         SERIAL         NOT NULL,
+    NIVELPRIORIDAD         CHAR(10)       NOT NULL,
+    CONSTRAINT PK_ESTADO_TICKET PRIMARY KEY (IDESTADOTICKET)
+);
+
+/*==============================================================*/
+/* Table: PASWORD                                               */
+/*==============================================================*/
+CREATE TABLE PASWORD (
+    IDPASWORD              SERIAL         NOT NULL,
+    CLAVEACCESO            VARCHAR(10)    NOT NULL,
+    CONSTRAINT PK_PASWORD PRIMARY KEY (IDPASWORD)
+);
+
+/*==============================================================*/
+/* Table: TIPO_SERVICIO                                         */
+/*==============================================================*/
+CREATE TABLE TIPO_SERVICIO (
+    IDTIPOSERVICIO         SERIAL         NOT NULL,
+    NOMBRESERVICIO         CHAR(80)       NOT NULL,
+    CONSTRAINT PK_TIPO_SERVICIO PRIMARY KEY (IDTIPOSERVICIO)
+);
+
+/*==============================================================*/
+/* Table: TIPO_USUARIO                                          */
+/*==============================================================*/
+CREATE TABLE TIPO_USUARIO (
+    IDTIPOUSUARIO          SERIAL         NOT NULL,
+    IDENTIFICADOR          CHAR(9)        NOT NULL,
+    CARGO                  CHAR(30)       NOT NULL,
+    CONSTRAINT PK_TIPO_USUARIO PRIMARY KEY (IDTIPOUSUARIO)
+);
+
+/*==============================================================*/
+/* Table: TICKET                                                */
+/*==============================================================*/
+CREATE TABLE TICKET (
+    IDTICKET               SERIAL         NOT NULL,
+    IDESTADOTICKET         INT4           NOT NULL,
+    FECHAASIGNACION        DATE           NOT NULL,
+    NUMEROTICKET           CHAR(5)        NOT NULL,
+    CONSTRAINT PK_TICKET PRIMARY KEY (IDTICKET)
+);
+
+/*==============================================================*/
+/* Table: USUARIO                                               */
+/*==============================================================*/
+CREATE TABLE USUARIO (
+    IDUSUARIO              SERIAL         NOT NULL,
+    IDPASWORD              INT4           NOT NULL,
+    IDTIPOUSUARIO          INT4           NOT NULL,
+    NOMBRES                CHAR(30)       NOT NULL,
+    APELLIDOS              CHAR(30)       NOT NULL,
+    CORREOELECTRONICO      CHAR(25)       NOT NULL,
+    CONSTRAINT PK_USUARIO PRIMARY KEY (IDUSUARIO)
+);
+
+/*==============================================================*/
+/* Table: SOLICITUD                                             */
+/*==============================================================*/
+CREATE TABLE SOLICITUD (
+    IDSOLICITUD            SERIAL         NOT NULL,
+    IDUSUARIO              INT4           NOT NULL,
+    IDTIPOSERVICIO         INT4           NOT NULL,
+    IDESTADOSOLICITUD      INT4           NOT NULL,
+    IDTICKET               INT4           NOT NULL,
+    FECHACREACION          DATE           NOT NULL,
+    DESCRIPCION            CHAR(300)      NOT NULL,
+    CONSTRAINT PK_SOLICITUD PRIMARY KEY (IDSOLICITUD)
+);
+
+---
+-- CREACIÓN DE ÍNDICES Y CLAVES FORÁNEAS
+---
+
+/* Índices Únicos (PK) */
+CREATE UNIQUE INDEX ESTADO_SOLICITUD_PK ON ESTADO_SOLICITUD (IDESTADOSOLICITUD);
+CREATE UNIQUE INDEX ESTADO_TICKET_PK ON ESTADO_TICKET (IDESTADOTICKET);
+CREATE UNIQUE INDEX PASWORD_PK ON PASWORD (IDPASWORD);
+CREATE UNIQUE INDEX TIPO_SERVICIO_PK ON TIPO_SERVICIO (IDTIPOSERVICIO);
+CREATE UNIQUE INDEX TIPO_USUARIO_PK ON TIPO_USUARIO (IDTIPOUSUARIO);
+CREATE UNIQUE INDEX TICKET_PK ON TICKET (IDTICKET);
+CREATE UNIQUE INDEX USUARIO_PK ON USUARIO (IDUSUARIO);
+CREATE UNIQUE INDEX SOLICITUD_PK ON SOLICITUD (IDSOLICITUD);
+
+/* Índices de FK */
+CREATE INDEX CONTIENE_FK ON TICKET (IDESTADOTICKET);
+CREATE INDEX POSEE_FK ON USUARIO (IDPASWORD);
+CREATE INDEX PERTENECE_FK ON USUARIO (IDTIPOUSUARIO);
+CREATE INDEX GENERA_FK ON SOLICITUD (IDUSUARIO);
+CREATE INDEX REQUIERE_FK ON SOLICITUD (IDTIPOSERVICIO);
+CREATE INDEX ADOPTA_FK ON SOLICITUD (IDESTADOSOLICITUD);
+CREATE INDEX ORIGINA_FK ON SOLICITUD (IDTICKET);
+
+/* Claves Foráneas (FK) */
+ALTER TABLE TICKET
+    ADD CONSTRAINT FK_TICKET_CONTIENE_ESTADO_T FOREIGN KEY (IDESTADOTICKET)
+      REFERENCES ESTADO_TICKET (IDESTADOTICKET)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE USUARIO
+    ADD CONSTRAINT FK_USUARIO_POSEE_PASWORD FOREIGN KEY (IDPASWORD)
+      REFERENCES PASWORD (IDPASWORD)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE USUARIO
+    ADD CONSTRAINT FK_USUARIO_PERTENECE_TIPO_USU FOREIGN KEY (IDTIPOUSUARIO)
+      REFERENCES TIPO_USUARIO (IDTIPOUSUARIO)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE SOLICITUD
+    ADD CONSTRAINT FK_SOLICITU_GENERA_USUARIO FOREIGN KEY (IDUSUARIO)
+      REFERENCES USUARIO (IDUSUARIO)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE SOLICITUD
+    ADD CONSTRAINT FK_SOLICITU_REQUIERE_TIPO_SER FOREIGN KEY (IDTIPOSERVICIO)
+      REFERENCES TIPO_SERVICIO (IDTIPOSERVICIO)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE SOLICITUD
+    ADD CONSTRAINT FK_SOLICITU_ADOPTA_ESTADO_S FOREIGN KEY (IDESTADOSOLICITUD)
+      REFERENCES ESTADO_SOLICITUD (IDESTADOSOLICITUD)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE SOLICITUD
+    ADD CONSTRAINT FK_SOLICITU_ORIGINA_TICKET FOREIGN KEY (IDTICKET)
+      REFERENCES TICKET (IDTICKET)
+      ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+---
+-- INSERCIÓN DE DATOS SOLICITADOS
+---
+
+-- Tabla TIPO_USUARIO 
+INSERT INTO TIPO_USUARIO (IDENTIFICADOR, CARGO) VALUES ('P-AB00001', 'Programador');
+INSERT INTO TIPO_USUARIO (IDENTIFICADOR, CARGO) VALUES ('C-AC00002', 'Cliente');
+INSERT INTO TIPO_USUARIO (IDENTIFICADOR, CARGO) VALUES ('T-AT00003', 'Técnico');
+
+-- Tabla ESTADO_SOLICITUD 
+INSERT INTO ESTADO_SOLICITUD (ESTADOSOLICITUD) VALUES ('En Proceso');
+INSERT INTO ESTADO_SOLICITUD (ESTADOSOLICITUD) VALUES ('Pendiente');
+INSERT INTO ESTADO_SOLICITUD (ESTADOSOLICITUD) VALUES ('Cancelado');
+INSERT INTO ESTADO_SOLICITUD (ESTADOSOLICITUD) VALUES ('Finalizado');
+
+-- Tabla ESTADO_TICKET 
+INSERT INTO ESTADO_TICKET (NIVELPRIORIDAD) VALUES ('Baja');
+INSERT INTO ESTADO_TICKET (NIVELPRIORIDAD) VALUES ('Media');
+INSERT INTO ESTADO_TICKET (NIVELPRIORIDAD) VALUES ('Alta');
+INSERT INTO ESTADO_TICKET (NIVELPRIORIDAD) VALUES ('Urgente');
+
+-- Tabla TIPO_SERVICIO 
+INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Instalación y configuración de equipos informáticos');
+INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Mantenimiento preventivo y correctivo de hardware');
+INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Diagnóstico y reparación de fallos en equipos');
+INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Soporte de conectividad');
+INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Instalación, configuración y actualización de software interno');
+INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Recuperación de acceso');
