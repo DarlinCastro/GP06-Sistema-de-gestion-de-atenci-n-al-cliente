@@ -1,0 +1,36 @@
+# ----------------------------------------------------------------------
+# NetBeans IDE
+# Archivos y directorios generados que DEBEN ser ignorados
+# ----------------------------------------------------------------------
+
+# Directorios de compilación y distribución generados
+/build/
+/dist/
+
+# Configuraciones de NetBeans específicas del usuario/entorno local
+# ¡ESTO ES CRÍTICO! Contiene rutas absolutas y configuraciones de sesión.
+/nbproject/private/
+nb-configuration.xml
+
+# Directorio de caché (puede aparecer en proyectos más recientes)
+/nb-cache/
+
+# ----------------------------------------------------------------------
+# Archivos de Java
+# ----------------------------------------------------------------------
+
+# Archivos de clase compilados (los binarios de Java)
+*.class
+
+# Archivos de empaquetado (WAR, EAR, JAR, etc.)
+*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.tar.gz
+
+# Archivos de logs y datos temporales
+*.log
+*.bak
+*~
