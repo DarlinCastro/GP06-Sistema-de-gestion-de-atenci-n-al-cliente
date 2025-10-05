@@ -30,12 +30,23 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
         btnAtras = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Administrador");
 
         btnGestionarUsuarios.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnGestionarUsuarios.setText("Gestionar Usuarios");
+        btnGestionarUsuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGestionarUsuariosActionPerformed(evt);
+            }
+        });
 
         btnAsignarSolicitudes.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnAsignarSolicitudes.setText("Asignar Solicitudes");
+        btnAsignarSolicitudes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAsignarSolicitudesActionPerformed(evt);
+            }
+        });
 
         lblMenuAdministrador.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblMenuAdministrador.setText("Menu Administrador");
@@ -49,7 +60,7 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
         });
 
         btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnAtras.setText("Atras");
+        btnAtras.setText("Atrás");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -61,9 +72,9 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
                     .addComponent(btnAtras)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnGestionarUsuarios)
-                        .addGap(44, 44, 44)
+                        .addGap(42, 42, 42)
                         .addComponent(btnAsignarSolicitudes)
-                        .addGap(32, 32, 32)
+                        .addGap(34, 34, 34)
                         .addComponent(btnGenerarReportes)
                         .addGap(13, 13, 13)))
                 .addContainerGap(34, Short.MAX_VALUE))
@@ -93,6 +104,21 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
     private void btnGenerarReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReportesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnGenerarReportesActionPerformed
+
+    //BOTON ASIGNAR SOLICITUDES
+    private void btnAsignarSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignarSolicitudesActionPerformed
+        jFrameAsignarSolicitud asignar = new jFrameAsignarSolicitud();
+        asignar.setVisible(true);
+        asignar.setLocationRelativeTo(null);
+        this.dispose();//Cierra la ventana actual
+    }//GEN-LAST:event_btnAsignarSolicitudesActionPerformed
+
+    private void btnGestionarUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionarUsuariosActionPerformed
+         jFrameGestionarUsuarios gUsuarios = new jFrameGestionarUsuarios();
+         gUsuarios.setVisible(true);
+         gUsuarios .setLocationRelativeTo(null);
+        this.dispose();//Cierra la ventana actual
+    }//GEN-LAST:event_btnGestionarUsuariosActionPerformed
 
     /**
      * @param args the command line arguments
