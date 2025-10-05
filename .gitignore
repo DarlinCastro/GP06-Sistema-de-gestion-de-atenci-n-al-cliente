@@ -34,3 +34,4 @@ nb-configuration.xml
 *.log
 *.bak
 *~
+/Sistema de gestion de atencion al cliente/build/
