@@ -3,12 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/Main.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/jFrameGenerarReporte.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/jFrameMenuTecnico.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/jFrameLogin.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/jFrameMenuAdmin.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/jFrameSeguimientoSolicitud.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/TipoUsuario.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_vista/jFrameSeguimientoSolicitud.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/EstadoSolicitud.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/Usuario.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/Ticket.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/Password.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/EstadoTicket.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/TipoServicio.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/Solicitud.java</file>
         </group>
     </open-files>
 </project-private>
