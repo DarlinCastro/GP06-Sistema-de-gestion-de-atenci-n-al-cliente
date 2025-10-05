@@ -28,4 +28,13 @@ public class Password {
     public String getIdentificador() {
         return identificador;
     }
+
+    public void setClaveAcceso(String claveAcceso) {
+        this.claveAcceso = claveAcceso;
+    }
+
+    public void setIdentificador(String identificador) {
+        this.identificador = identificador;
+    }
+    
 }
