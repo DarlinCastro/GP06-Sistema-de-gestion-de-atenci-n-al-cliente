@@ -42,6 +42,11 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
 
         btnGenerarReportes.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnGenerarReportes.setText("Generar Reportes");
+        btnGenerarReportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarReportesActionPerformed(evt);
+            }
+        });
 
         btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnAtras.setText("Atras");
@@ -95,6 +100,13 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
         vSeguimiento.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnSeguimientoActionPerformed
+
+    private void btnGenerarReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReportesActionPerformed
+        // TODO add your handling code here:
+        jFrameGenerarReporte vReporte = new jFrameGenerarReporte();
+        vReporte.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnGenerarReportesActionPerformed
 
     /**
      * @param args the command line arguments

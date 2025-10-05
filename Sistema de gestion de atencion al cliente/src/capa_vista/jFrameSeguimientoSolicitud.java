@@ -26,10 +26,27 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
     private void initComponents() {
 
         btnAtras = new javax.swing.JButton();
+        lblCargo = new javax.swing.JLabel();
+        lblNombre = new javax.swing.JLabel();
+        lblNTicket = new javax.swing.JLabel();
+        lblFechaCreacion = new javax.swing.JLabel();
+        lblTipoServicio = new javax.swing.JLabel();
+        lblDescripcion = new javax.swing.JLabel();
+        lblEstadoSolicitud = new javax.swing.JLabel();
+        lblNivelPrioridad = new javax.swing.JLabel();
+        btnActualizarSolicitud = new javax.swing.JButton();
+        btnCancelarSolicitud = new javax.swing.JButton();
+        cbCargo = new javax.swing.JComboBox<>();
+        cbNombre = new javax.swing.JComboBox<>();
+        cbNTicket = new javax.swing.JComboBox<>();
+        cbEstadoSolicitud = new javax.swing.JComboBox<>();
+        txtFechaCreacion = new javax.swing.JTextField();
+        txtTipoServicio = new javax.swing.JTextField();
+        txtDescripcion = new javax.swing.JTextField();
+        txtNivelPrioridad = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnAtras.setText("Atras");
         btnAtras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -37,21 +54,120 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
             }
         });
 
+        lblCargo.setText("Cargo");
+
+        lblNombre.setText("Nombre");
+
+        lblNTicket.setText("N° ticket");
+
+        lblFechaCreacion.setText("Fecha Creacion");
+
+        lblTipoServicio.setText("Tipo Servicio");
+
+        lblDescripcion.setText("Descripcion");
+
+        lblEstadoSolicitud.setText("Estado de Solicitud");
+
+        lblNivelPrioridad.setText("Nivel de prioridad");
+
+        btnActualizarSolicitud.setText("Actualizar Solicitud");
+        btnActualizarSolicitud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarSolicitudActionPerformed(evt);
+            }
+        });
+
+        btnCancelarSolicitud.setText("Cancelar Solicitud");
+        btnCancelarSolicitud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarSolicitudActionPerformed(evt);
+            }
+        });
+
+        cbCargo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cbNombre.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cbNTicket.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        cbEstadoSolicitud.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(581, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(73, 73, 73)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnActualizarSolicitud)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCancelarSolicitud))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblEstadoSolicitud)
+                            .addComponent(lblNivelPrioridad, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDescripcion, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTipoServicio, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblFechaCreacion, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNTicket, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNombre, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblCargo, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(cbEstadoSolicitud, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtDescripcion, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtTipoServicio, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtFechaCreacion, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbNombre, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cbNTicket, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtNivelPrioridad)
+                            .addComponent(cbCargo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                 .addComponent(btnAtras)
-                .addGap(20, 20, 20))
+                .addGap(19, 19, 19))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addComponent(btnAtras)
-                .addContainerGap(280, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAtras)
+                    .addComponent(lblCargo)
+                    .addComponent(cbCargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNombre))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNTicket)
+                    .addComponent(cbNTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblFechaCreacion))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTipoServicio)
+                    .addComponent(txtTipoServicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDescripcion))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblEstadoSolicitud)
+                    .addComponent(cbEstadoSolicitud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNivelPrioridad)
+                    .addComponent(txtNivelPrioridad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnActualizarSolicitud)
+                    .addComponent(btnCancelarSolicitud))
+                .addGap(31, 31, 31))
         );
 
         pack();
@@ -63,6 +179,14 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
         vTecnico.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void btnActualizarSolicitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarSolicitudActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnActualizarSolicitudActionPerformed
+
+    private void btnCancelarSolicitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarSolicitudActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCancelarSolicitudActionPerformed
 
     /**
      * @param args the command line arguments
@@ -100,6 +224,24 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizarSolicitud;
     private javax.swing.JButton btnAtras;
+    private javax.swing.JButton btnCancelarSolicitud;
+    private javax.swing.JComboBox<String> cbCargo;
+    private javax.swing.JComboBox<String> cbEstadoSolicitud;
+    private javax.swing.JComboBox<String> cbNTicket;
+    private javax.swing.JComboBox<String> cbNombre;
+    private javax.swing.JLabel lblCargo;
+    private javax.swing.JLabel lblDescripcion;
+    private javax.swing.JLabel lblEstadoSolicitud;
+    private javax.swing.JLabel lblFechaCreacion;
+    private javax.swing.JLabel lblNTicket;
+    private javax.swing.JLabel lblNivelPrioridad;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblTipoServicio;
+    private javax.swing.JTextField txtDescripcion;
+    private javax.swing.JTextField txtFechaCreacion;
+    private javax.swing.JTextField txtNivelPrioridad;
+    private javax.swing.JTextField txtTipoServicio;
     // End of variables declaration//GEN-END:variables
 }
