@@ -55,6 +55,26 @@ public class Usuario {
         return password;
     }
 
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+    }
+
+    public void setPassword(Password password) {
+        this.password = password;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public void setCorreoElectronico(String correoElectronico) {
+        this.correoElectronico = correoElectronico;
+    }
+
     // --- Método toString (Clave para los JComboBox de la vista) ---
     /*
      * Devuelve el nombre completo, usado para mostrar en las interfaces de usuario.

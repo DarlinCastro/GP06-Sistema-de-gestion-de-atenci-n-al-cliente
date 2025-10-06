@@ -4,6 +4,11 @@
  */
 package capa_vista;
 
+import capa_controladora.CuentaController;
+import entidades.TipoUsuario;
+import entidades.Usuario;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Adam
@@ -52,8 +57,18 @@ public class jFrameCrearCuenta extends javax.swing.JFrame {
         lblContraseña.setText("Contraseña:");
 
         btnRegistrar.setText("Registrar");
+        btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarActionPerformed(evt);
+            }
+        });
 
         btnAtras.setText("Atras");
+        btnAtras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtrasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -119,6 +134,58 @@ public class jFrameCrearCuenta extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+        // captura los datos ingresados por teclado
+        String nombre = txtNombre.getText().trim();
+        String apellido = txtApellido.getText().trim();
+        String correo = txtCorreo.getText().trim();
+        String identificador = txtIdentificador.getText().trim();
+        String contraseña = txtContraseña.getText().trim();
+        //valida campos vacios
+        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || identificador.isEmpty() || contraseña.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios");
+            return;
+        }
+        //crea objeto
+        Usuario usuario = new Usuario();
+        usuario.setNombres(nombre);
+        usuario.setApellidos(apellido);
+        usuario.setCorreoElectronico(correo);
+        /*
+        //crea y asigna tipo de usuario
+        TipoUsuario tipo=new TipoUsuario();
+        tipo.setCargo("Cliente");
+        usuario.setTipoUsuario(tipo);
+        //
+        */
+        CuentaController cuenta = new CuentaController();
+        boolean registrado = cuenta.registrarUsuario(usuario, contraseña, identificador);
+
+        //confirma registro
+        if (registrado) {
+            JOptionPane.showMessageDialog(this, "Usuario registrado correctamente");
+            limpiarCampos();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al registrar usuario");
+        }
+    }//GEN-LAST:event_btnRegistrarActionPerformed
+
+    private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
+        // Regresa a la pantalla anterior 
+        this.dispose();
+        jFrameLogin login=new jFrameLogin();
+        login.setVisible(true);
+        login.setLocationRelativeTo(null);
+    }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void limpiarCampos() {
+        txtNombre.setText("");
+        txtApellido.setText("");
+        txtCorreo.setText("");
+        txtIdentificador.setText("");
+        txtContraseña.setText("");
+    }
 
     /**
      * @param args the command line arguments
