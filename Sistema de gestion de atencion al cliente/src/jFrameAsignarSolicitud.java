@@ -257,7 +257,7 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAsignarActionPerformed
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
-        jFrameMenuCliente atras = new jFrameMenuCliente();
+        jFrameMenuAdmin atras = new jFrameMenuAdmin();
         atras.setVisible(true);
         atras.setLocationRelativeTo(null);
         this.dispose();//Cierra la ventana actual
