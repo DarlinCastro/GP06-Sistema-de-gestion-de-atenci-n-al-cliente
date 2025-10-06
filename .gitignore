@@ -9,7 +9,10 @@
 
 # Configuraciones de NetBeans específicas del usuario/entorno local
 # ¡ESTO ES CRÍTICO! Contiene rutas absolutas y configuraciones de sesión.
-/nbproject/private/
+
+nbproject/private/
+*.properties
+*.xml
 nb-configuration.xml
 
 # Directorio de caché (puede aparecer en proyectos más recientes)
