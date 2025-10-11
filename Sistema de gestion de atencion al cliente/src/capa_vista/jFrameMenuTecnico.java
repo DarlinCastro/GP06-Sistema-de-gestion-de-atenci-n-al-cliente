@@ -1,11 +1,14 @@
 package capa_vista;
 
+import capa_controladora.SolicitudController;
+import capa_vista.jFrameSeguimientoSolicitud; // Asumiendo que esta es la ruta de tu vista
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 
-/**
+ /*
  *
  * @author RYZEN
  */
@@ -95,9 +98,13 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSeguimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeguimientoActionPerformed
-        // TODO add your handling code here:
+        // 1. Crea la interfaz visual (la Vista)
         jFrameSeguimientoSolicitud vSeguimiento = new jFrameSeguimientoSolicitud();
-        vSeguimiento.setVisible(true);
+        // 2. Crea el Controlador, pasándole la Vista
+        SolicitudController controlador = new SolicitudController(vSeguimiento);
+        // 3. Le pedimos al Controller que inicie la Vista y la lógica
+        controlador.iniciar();
+        // 4. Cierra la ventana actual
         this.dispose();
     }//GEN-LAST:event_btnSeguimientoActionPerformed
 

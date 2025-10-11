@@ -16,10 +16,17 @@ public class TipoServicio {
     }
 
     public TipoServicio(String nombreServicio) {
+        // Aseguramos que el constructor guarde el valor limpio
         this.nombreServicio = nombreServicio != null ? nombreServicio.trim() : "";
     }
 
     public String getNombreServicio() {
         return nombreServicio;
+    }
+    
+    @Override
+    public String toString() {
+        // Retorna el nombre del servicio, asegurando que no tenga espacios extra
+        return this.nombreServicio != null ? this.nombreServicio.trim() : "";
     }
 }
