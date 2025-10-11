@@ -23,6 +23,10 @@ public class TipoUsuario {
         return cargo;
     }
 
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
+
     @Override
     public String toString() {
         return cargo;
