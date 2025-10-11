@@ -8,6 +8,7 @@ package entidades;
  *
  * @author RYZEN
  */
+
 public class EstadoTicket {
 
     private String nivelPrioridad; 
@@ -16,10 +17,17 @@ public class EstadoTicket {
     }
 
     public EstadoTicket(String nivelPrioridad) {
+        // Ensures the value is cleaned and stored
         this.nivelPrioridad = nivelPrioridad != null ? nivelPrioridad.trim() : "";
     }
 
     public String getNivelPrioridad() {
         return nivelPrioridad;
+    }
+    
+    @Override
+    public String toString() {
+        // Returns the stored level, ensuring no extra spaces are passed back
+        return this.nivelPrioridad != null ? this.nivelPrioridad.trim() : "";
     }
 }
