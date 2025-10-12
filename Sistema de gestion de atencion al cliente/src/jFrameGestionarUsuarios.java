@@ -1,4 +1,6 @@
-
+import base_datos.UsuarioDAO;
+import entidades.Usuario;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -12,13 +14,77 @@ import javax.swing.table.DefaultTableModel;
  * @author erick
  */
 public class jFrameGestionarUsuarios extends javax.swing.JFrame {
-
+    private UsuarioDAO dao;  // Instancia del DAO para conectar con BD
+    private int idUsuarioSeleccionado = -1;  // Para actualizar/eliminar (ID del usuario seleccionado)
     /**
      * Creates new form jFrameGestionarUsuarios
      */
     public jFrameGestionarUsuarios() {
         initComponents();
+        
+       dao = new UsuarioDAO();  // Inicializa el DAO
+       setLocationRelativeTo(null);  // Centra la ventana 
+       limpiarCampos();  // Limpia los campos al inicio
+       listarUsuarios();  // Carga la lista inicial en la JTable
+
     }
+    private Usuario obtenerUsuarioDeCampos() {
+        // Validaciones básicas
+        if (txtNombres.getText().trim().isEmpty() || txtApellidos.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Llena nombres y apellidos obligatorios.");
+        return null;
+        }
+        if (txtCorreo.getText().trim().isEmpty() || txtId.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Llena correo e identificador.");
+        return null;
+    }
+        // Crea instancia de Usuario usando constructor vacío
+         Usuario u = new Usuario();  // Usa tu clase Usuario
+        
+        // Mapea campos del JFrame a setters de Usuario
+            u.setId(idUsuarioSeleccionado > 0 ? idUsuarioSeleccionado : 0);  // ID de BD (para actualizar; 0 para nuevo)
+            u.setNombres(txtNombres.getText().trim());
+            u.setApellidos(txtApellidos.getText().trim());
+            u.setCorreoElectronico(txtCorreo.getText().trim());
+            u.setCargo((String) cbCargos.getSelectedItem());  // Del JComboBox
+            u.setIdentificador(txtId.getText().trim());  // txtId es identificador (string)
+            u.setContrasena(txtContraseña.getText().trim());  // String plano; integra con Password en setter si necesitas
+    
+        return u;  // Retorna el Usuario listo para el DAO
+}
+    //Limpia los campos del formulario
+    private void limpiarCampos() {
+        txtNombres.setText("");
+        txtApellidos.setText("");
+        txtCorreo.setText("");
+        cbCargos.setSelectedIndex(0);  // Selecciona primer cargo por defecto
+        txtId.setText("");  // Identificador
+        txtContraseña.setText("");
+        idUsuarioSeleccionado = -1;
+        // Deshabilita botones de editar si quieres
+        // btnActualizar.setEnabled(false);
+        // btnEliminar.setEnabled(false);
+    }
+    
+    //Carga todos los usuarios desde la BD y los muestra en la JTable.
+     private void listarUsuarios() {
+        List<Usuario> usuarios = dao.listarUsuarios();
+        DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
+        modelo.setRowCount(0);  // Limpia la tabla
+        
+        for (Usuario u : usuarios) {
+            modelo.addRow(new Object[]{
+                u.getNombres(),
+                u.getApellidos(),
+                u.getCorreoElectronico(),
+                u.getCargo(),
+                u.getIdentificador(),
+                u.getContrasena()// Podemos eliminar esta linea si no queremos mostrar la contraseña en la tabla, solo por seguridad
+            });
+        }
+    }
+    //Carga datos de la fila seleccionada en la tabla a los campos (para editar).
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -103,6 +169,11 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
                 "Nombres", "Apellidos", "Correo Electrónico", "Cargo", "Identificador", "Contraseña"
             }
         ));
+        jTablaUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTablaUsuariosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTablaUsuarios);
 
         btnAtras.setText("Atrás");
@@ -205,74 +276,80 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        // Obtenemos el modelo de la tabla
-                DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
-                
-                // Creamos una fila con los datos del formulario
-                Object[] columna = {
-                    txtNombres.getText(),
-                    txtApellidos.getText(),
-                    txtCorreo.getText(),            
-                    cbCargos.getSelectedItem(),
-                    txtId.getText(),
-                    txtContraseña.getText()
-                };
-                modelo.addRow(columna);
-
-                // Limpiamos campos después de asignar
-                txtNombres.setText("");               
-                txtApellidos.setText("");
-                txtCorreo.setText("");
-                txtId.setText("");
-                txtContraseña.setText("");
+        Usuario u = obtenerUsuarioDeCampos();
+        if (u.getNombres().isEmpty() || u.getApellidos().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Llena nombres y apellidos.");
+            return;
+        }
+        if (dao.insertarUsuario(u)) {
+            JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente en BD.");
+            listarUsuarios();  // Actualiza la tabla
+            limpiarCampos();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al registrar. Verifica datos (ej: identificador único).");
+        }
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        
+        System.out.println("ID antes de actualizar: " + idUsuarioSeleccionado); // para depurar
+        if (idUsuarioSeleccionado <= 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona un usuario de la tabla para actualizar.");
+            return;
+        }
+        Usuario u = obtenerUsuarioDeCampos();
+        if (dao.actualizarUsuario(u)) {
+            JOptionPane.showMessageDialog(this, "Usuario actualizado en BD.");
+            listarUsuarios();
+            limpiarCampos();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al actualizar.");
+        }
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-                // Obtenemos el modelo de la tabla
-                DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
-                
-                //Detectar fila seleccionada
-                int filaSeleccionada =jTablaUsuarios.getSelectedRow();
-                
-                //Eliminar fila del modelo con confirmación
-                if (filaSeleccionada != -1) {
-                     // Mostrar cuadro de confirmación
-                int confirmacion = JOptionPane.showConfirmDialog(null,"¿Estás seguro de que deseas eliminar este usuario?","Confirmar eliminación",JOptionPane.YES_NO_OPTION);
-                
-                if (confirmacion == JOptionPane.YES_OPTION) {
-                     modelo.removeRow(filaSeleccionada);
-                     JOptionPane.showMessageDialog(null, "Usuario eliminado correctamente.");
+        if (idUsuarioSeleccionado <= 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona un usuario de la tabla.");
+        return;
+    }
+        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirmacion == JOptionPane.YES_OPTION) {
+        if (dao.eliminarUsuario(idUsuarioSeleccionado)) {  // Llama a DAO con ID numérico
+            JOptionPane.showMessageDialog(this, "Usuario eliminado de la BD.");
+            listarUsuarios();  // Recarga tabla
+            limpiarCampos();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al eliminar.");
         }
-                } else {
-                JOptionPane.showMessageDialog(null, "Selecciona un usuario para eliminar.");
-}    
+      }    
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-         DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
-                  boolean encontrado = false;
-                  String texto = txtBuscar.getText();
-
-    for (int i = 0; i < modelo.getRowCount(); i++) {
-        for (int j = 0; j < modelo.getColumnCount(); j++) {
-            Object valor = modelo.getValueAt(i, j);
-            if (valor != null && valor.toString().toLowerCase().contains(texto.toLowerCase())) {
-                jTablaUsuarios.setRowSelectionInterval(i, i);
-                jTablaUsuarios.scrollRectToVisible(jTablaUsuarios.getCellRect(i, 0, true));
-                encontrado = true;
-                break;
-            }
+       String texto = txtBuscar.getText().trim();
+       if (texto.isEmpty()) {
+        listarUsuarios();  // Si vacío, muestra todos
+        return;
+    }
+    
+    // Llama a un método de búsqueda en DAO 
+        List<Usuario> resultados = dao.buscarUsuarios(texto);  // Busca por nombres, identificador, etc.
+        DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
+        modelo.setRowCount(0);  // Limpia tabla
+    
+    for (Usuario u : resultados) {
+        modelo.addRow(new Object[]{
+            u.getNombres(),
+            u.getApellidos(),
+            u.getCorreoElectronico(),
+            u.getCargo(),
+            u.getIdentificador()
+        });
+    }
+    
+    if (resultados.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "No se encontró ningún usuario.");
+        } else {
+        JOptionPane.showMessageDialog(this, "Se encontraron " + resultados.size() + " resultados.");
         }
-        if (encontrado) break;
-    }
-
-    if (!encontrado) {
-        JOptionPane.showMessageDialog(null, "No se encontró ningún resultado.");
-    }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
@@ -281,6 +358,23 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
         atras.setLocationRelativeTo(null);
         this.dispose();//Cierra la ventana actual
     }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void jTablaUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTablaUsuariosMouseClicked
+        int fila = jTablaUsuarios.getSelectedRow();
+    if (fila >= 0) {
+        String identificador = jTablaUsuarios.getValueAt(fila, 4).toString();
+        Usuario u = dao.buscarPorIdentificador(identificador);
+        if (u != null) {
+            idUsuarioSeleccionado = u.getId();
+            txtNombres.setText(u.getNombres());
+            txtApellidos.setText(u.getApellidos());
+            txtCorreo.setText(u.getCorreoElectronico());
+            cbCargos.setSelectedItem(u.getCargo());
+            txtId.setText(u.getIdentificador());
+            txtContraseña.setText("");
+        }
+    }
+    }//GEN-LAST:event_jTablaUsuariosMouseClicked
 
     /**
      * @param args the command line arguments

@@ -1,3 +1,12 @@
+ 
+import base_datos.SolicitudDAO;
+import entidades.EstadoSolicitud;
+import entidades.Solicitud;
+import entidades.TipoServicio;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -8,14 +17,21 @@
  * @author erick
  */
 public class jFrameCrearSolicitud extends javax.swing.JFrame {
+    private SolicitudDAO dao = new SolicitudDAO(); 
 
     /**
      * Creates new form jFrameCrearSolicitud
      */
     public jFrameCrearSolicitud() {
         initComponents();
+        txtFechaCreacion.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
+    //Limpia los campos 
+    private void limpiarCamposSolicitud() {     
+        cbTipoServicio.setSelectedIndex(0);
+        txtDescripcion.setText("");
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,13 +54,13 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Crear Solicitud");
 
-        jLabel1.setText("Fecha Creación : ");
+        jLabel1.setText("Fecha de Creación : ");
 
         jLabel2.setText("Tipo de Servicio :");
 
         jLabel3.setText("Descripción :");
 
-        cbTipoServicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Instalación y configuración de equipos informáticos", "Mantenimiento preventivo y correctivo de hardware", "Diagnóstico y reparación de fallos en equipos", "Soporte de Conectividad", "Instalación, configurción y actualización de software interno", "Recuperación de acceso" }));
+        cbTipoServicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Instalación y configuración de equipos informáticos", "Mantenimiento preventivo y correctivo de hardware", "Diagnóstico y reparación de fallos en equipos", "Soporte de Conectividad", "Instalación, configuración y actualización de software interno", "Recuperación de acceso" }));
 
         txtDescripcion.setColumns(20);
         txtDescripcion.setRows(5);
@@ -58,6 +74,11 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         });
 
         btnCrearSolicitud.setText("Crear Solicitud");
+        btnCrearSolicitud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCrearSolicitudActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -67,25 +88,24 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(52, 52, 52)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnAtras)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(btnAtras)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel2)
                                         .addComponent(jLabel3))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addComponent(cbTipoServicio, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jScrollPane1))))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(218, 218, 218)
                         .addComponent(btnCrearSolicitud)))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,6 +138,29 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         atras.setLocationRelativeTo(null);
         this.dispose();//Cierra la ventana actual
     }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void btnCrearSolicitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearSolicitudActionPerformed
+        try {
+        // Construir la solicitud
+        Solicitud solicitud = new Solicitud();
+        solicitud.setFechaCreacion(new Date()); // Asigna la fecha actual       
+        solicitud.setTipoServicio(new TipoServicio(cbTipoServicio.getSelectedItem().toString()));
+        solicitud.setDescripcion(txtDescripcion.getText());
+        solicitud.setEstadoSolicitud(new EstadoSolicitud("Pendiente"));
+
+        // Insertar en la BD
+        if (dao.insertarSolicitud(solicitud)) {
+            JOptionPane.showMessageDialog(this, "Solicitud creada exitosamente.");
+            limpiarCamposSolicitud();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al crear la solicitud.");
+        }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error en los datos ingresados.");
+            System.err.println("Error: " + e.getMessage());
+        }
+
+    }//GEN-LAST:event_btnCrearSolicitudActionPerformed
 
     /**
      * @param args the command line arguments

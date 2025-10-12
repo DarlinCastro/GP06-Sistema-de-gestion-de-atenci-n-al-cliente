@@ -28,20 +28,19 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace min="-2" pref="52" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="txtFechaCreacion" min="-2" pref="107" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                              <Component id="btnAtras" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="btnAtras" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" alignment="1" groupAlignment="0" attributes="0">
                                       <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="txtFechaCreacion" min="-2" pref="107" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="cbTipoServicio" max="32767" attributes="0"/>
                                       <Component id="jScrollPane1" max="32767" attributes="0"/>
@@ -55,7 +54,7 @@
                       <Component id="btnCrearSolicitud" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="51" max="32767" attributes="0"/>
+              <EmptySpace pref="34" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -89,7 +88,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Fecha Creaci&#xf3;n : "/>
+        <Property name="text" type="java.lang.String" value="Fecha de Creaci&#xf3;n : "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
@@ -110,7 +109,7 @@
             <StringItem index="1" value="Mantenimiento preventivo y correctivo de hardware"/>
             <StringItem index="2" value="Diagn&#xf3;stico y reparaci&#xf3;n de fallos en equipos"/>
             <StringItem index="3" value="Soporte de Conectividad"/>
-            <StringItem index="4" value="Instalaci&#xf3;n, configurci&#xf3;n y actualizaci&#xf3;n de software interno"/>
+            <StringItem index="4" value="Instalaci&#xf3;n, configuraci&#xf3;n y actualizaci&#xf3;n de software interno"/>
             <StringItem index="5" value="Recuperaci&#xf3;n de acceso"/>
           </StringArray>
         </Property>
@@ -148,6 +147,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Crear Solicitud"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCrearSolicitudActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

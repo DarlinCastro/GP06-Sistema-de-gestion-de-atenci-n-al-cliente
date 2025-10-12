@@ -7,17 +7,81 @@
  *
  * @author erick
  */
+import base_datos.ConexionBD;
+import base_datos.SolicitudDAO;
+import base_datos.UsuarioDAO;
+import entidades.Solicitud;
+import entidades.Usuario;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class jFrameAsignarSolicitud extends javax.swing.JFrame {
 
+public class jFrameAsignarSolicitud extends javax.swing.JFrame {   
     /**
      * Creates new form jFrameAsignarSolicitud
      */
     public jFrameAsignarSolicitud() {
         initComponents();
+        cargarComboTecnicos();
+        cargarTickets();
     }
+     
+    private SolicitudDAO solicitudDAO = new SolicitudDAO();    
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    
+    //CargarTickets
+    private void cargarTickets() {
+        List<String> tickets = solicitudDAO.obtenerTickets();  // Llama al DAO
+        if (!tickets.isEmpty()) {
+            cbTicket.addItem("");  // Opción por defecto
+            for (String ticket : tickets) {
+                cbTicket.addItem(ticket);  // Pobla el combo
+            }
+        } else {
+            cbTicket.addItem("No hay tickets disponibles");
+            System.err.println("No se pudieron cargar tickets.");
+        }
+    }
+    // Ejemplo: botón para recargar
+    private void recargarTickets() {
+        cbTicket.removeAllItems();
+        cargarTickets();
+    }
+    
+     
+  //Llena el combobox de Tecnicos para sleccionarlos y asignarles solicitud
+    private void cargarComboTecnicos() {
+    try (Connection conn = ConexionBD.conectar();
+         PreparedStatement ps = conn.prepareStatement(
+             "SELECT id, nombres, apellidos FROM usuarios WHERE cargo = 'Tecnico'"
+         );
+         ResultSet rs = ps.executeQuery()) {
 
+        cbTecnico.removeAllItems(); // Limpia el combo
+
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            String nombres = rs.getString("nombres").trim();
+            String apellidos = rs.getString("apellidos").trim();
+
+            Usuario tecnico = new Usuario(id, nombres, apellidos, null, null,null); 
+            cbTecnico.addItem(tecnico);
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error al cargar técnicos: " + e.getMessage());
+    }           
+    
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -41,20 +105,26 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabTablaAsignaciones = new javax.swing.JTable();
-        cbEstadoSolicitud = new javax.swing.JComboBox<>();
         txtFechaAsignacion = new javax.swing.JTextField();
         cbNivelPrioridad = new javax.swing.JComboBox<>();
         cbCargo = new javax.swing.JComboBox<>();
-        cbNombre = new javax.swing.JComboBox<>();
+        cbTecnico = new javax.swing.JComboBox<>();
         btnAsignar = new javax.swing.JButton();
         cbTipoServicio = new javax.swing.JComboBox<>();
         txtDescripcion = new javax.swing.JTextField();
         btnAtras = new javax.swing.JButton();
+        txtEstado = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Asignar Solicitudes");
 
         jLabel1.setText("Nº Ticket : ");
+
+        cbTicket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbTicketActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Fecha Creacion : ");
 
@@ -82,13 +152,15 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tabTablaAsignaciones);
 
-        cbEstadoSolicitud.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendiente", "En Proceso", "Finalizada" }));
-
-        cbNivelPrioridad.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Baja ", "Media", "Alta ", "Urgente" }));
+        cbNivelPrioridad.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Baja", "Media", "Alta", "Urgente" }));
 
         cbCargo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Técnico" }));
 
-        cbNombre.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Erick ", "Darlin ", "Adam", "Alejandro " }));
+        cbTecnico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbTecnicoActionPerformed(evt);
+            }
+        });
 
         btnAsignar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnAsignar.setText("Asignar");
@@ -144,8 +216,8 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addGap(4, 4, 4)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(cbEstadoSolicitud, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                            .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,7 +238,7 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
                                         .addComponent(txtFechaAsignacion, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(122, 122, 122)
                                         .addComponent(btnAtras))
-                                    .addComponent(cbNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbTecnico, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(cbNivelPrioridad, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(cbCargo, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
@@ -210,11 +282,11 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(cbEstadoSolicitud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cbNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbTecnico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel10))
                         .addGap(27, 27, 27)
                         .addComponent(btnAsignar)))
@@ -233,27 +305,70 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAsignarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignarActionPerformed
-            // Obtenemos el modelo de la tabla
-                DefaultTableModel modelo = (DefaultTableModel) tabTablaAsignaciones.getModel();
-                
-                // Creamos una fila con los datos del formulario
-                Object[] columna = {
-                    cbTicket.getSelectedItem(),
-                    txtFechaCreacion.getText(),
-                    cbTipoServicio.getSelectedItem(),
-                    txtDescripcion.getText(),
-                    cbEstadoSolicitud.getSelectedItem(),
-                    txtFechaAsignacion.getText(),
-                    cbNivelPrioridad.getSelectedItem(),
-                    cbCargo.getSelectedItem(),
-                    cbNombre.getSelectedItem()
-                };
-                modelo.addRow(columna);
+       // 1️⃣ Obtener los valores de los campos
+    String numeroTicket = cbTicket.getSelectedItem().toString();
+    String fechaCreacion = txtFechaCreacion.getText();
+    String tipoServicio = cbTipoServicio.getSelectedItem().toString();
+    String descripcion = txtDescripcion.getText();
+    String fechaAsignacion = txtFechaAsignacion.getText();
+    String nivelPrioridad = cbNivelPrioridad.getSelectedItem().toString();
+    String cargo = cbCargo.getSelectedItem().toString();
+    String nombre = cbTecnico.getSelectedItem().toString();
+    String estadoSolicitud = "Asignada"; // se cambia automáticamente al asignar
 
-                // Limpiamos campos después de asignar
-                txtFechaCreacion.setText("");               
-                txtDescripcion.setText("");
-                txtFechaAsignacion.setText("");  
+    //  2️⃣ Actualizar en la base de datos
+    try (Connection conn = ConexionBD.conectar()) {
+        String sql = "UPDATE solicitudes SET estado=?, fecha_asignacion=?, nivel_prioridad=?, cargo=?, nombre=? WHERE id=?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, estadoSolicitud);
+        ps.setString(2, fechaAsignacion);
+        ps.setString(3, nivelPrioridad);
+        ps.setString(4, cargo);
+        ps.setString(5, nombre);
+        ps.setString(6, numeroTicket);
+        ps.executeUpdate();
+        ps.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al actualizar la solicitud: " + e.getMessage());
+        return;
+    }
+
+    // 3️⃣ Agregar o actualizar la fila en la tabla de la interfaz
+    DefaultTableModel modelo = (DefaultTableModel) tabTablaAsignaciones.getModel();
+    boolean existe = false;
+
+    for (int i = 0; i < modelo.getRowCount(); i++) {
+        if (modelo.getValueAt(i, 0).toString().equals(numeroTicket)) {
+            modelo.setValueAt(fechaCreacion, i, 1);
+            modelo.setValueAt(tipoServicio, i, 2);
+            modelo.setValueAt(descripcion, i, 3);
+            modelo.setValueAt(estadoSolicitud, i, 4);
+            modelo.setValueAt(fechaAsignacion, i, 5);
+            modelo.setValueAt(nivelPrioridad, i, 6);
+            modelo.setValueAt(cargo, i, 7);
+            modelo.setValueAt(nombre, i, 8);
+            existe = true;
+            break;
+        }
+    }
+
+    if (!existe) {
+        modelo.addRow(new Object[]{
+            numeroTicket,
+            fechaCreacion,
+            tipoServicio,
+            descripcion,
+            estadoSolicitud,
+            fechaAsignacion,
+            nivelPrioridad,
+            cargo,
+            nombre
+        });
+    }
+
+    // 4️⃣ Confirmación visual
+    JOptionPane.showMessageDialog(this, "Solicitud asignada y mostrada en la tabla.");
+
     }//GEN-LAST:event_btnAsignarActionPerformed
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
@@ -262,6 +377,20 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
         atras.setLocationRelativeTo(null);
         this.dispose();//Cierra la ventana actual
     }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void cbTicketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTicketActionPerformed
+        
+            
+    }//GEN-LAST:event_cbTicketActionPerformed
+
+    private void cbTecnicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTecnicoActionPerformed
+        Usuario tecnico = (Usuario) cbTecnico.getSelectedItem();
+        if (tecnico != null) {
+        System.out.println("Técnico seleccionado: " + tecnico.getNombres());
+    }
+
+
+    }//GEN-LAST:event_cbTecnicoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -302,9 +431,8 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
     private javax.swing.JButton btnAsignar;
     private javax.swing.JButton btnAtras;
     private javax.swing.JComboBox<String> cbCargo;
-    private javax.swing.JComboBox<String> cbEstadoSolicitud;
     private javax.swing.JComboBox<String> cbNivelPrioridad;
-    private javax.swing.JComboBox<String> cbNombre;
+    private javax.swing.JComboBox<Usuario> cbTecnico;
     private javax.swing.JComboBox<String> cbTicket;
     private javax.swing.JComboBox<String> cbTipoServicio;
     private javax.swing.JLabel jLabel1;
@@ -320,6 +448,7 @@ public class jFrameAsignarSolicitud extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabTablaAsignaciones;
     private javax.swing.JTextField txtDescripcion;
+    private javax.swing.JTextField txtEstado;
     private javax.swing.JTextField txtFechaAsignacion;
     private javax.swing.JTextField txtFechaCreacion;
     // End of variables declaration//GEN-END:variables
