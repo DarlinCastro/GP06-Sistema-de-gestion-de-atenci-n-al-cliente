@@ -1,21 +1,118 @@
 package capa_vista;
 
+import capa_controladora.ReporteController;
+import entidades.TipoServicio;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableModel;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author RYZEN
  */
 public class jFrameGenerarReporte extends javax.swing.JFrame {
 
-    /**
-     * Creates new form jFrameGenerarReporte
-     */
+    private final ReporteController controller = new ReporteController();
+    private DefaultTableModel tableModel;
+
     public jFrameGenerarReporte() {
         initComponents();
+        inicializarComponentesPersonalizados();
+    }
+    
+    // MÉTODOS DE INICIALIZACIÓN Y CONFIGURACIÓN
+
+    private void inicializarComponentesPersonalizados() {
+        // Ocultar el botón individual al inicio
+        btnGenerarReporte.setVisible(false);
+        cargarComboBoxServicios();
+        configurarTabla(); // Configuración de tabla NO EDITABLE
+        agregarListenerSeleccionTabla(); // Lógica de alternancia de botones
+    }
+
+    private void cargarComboBoxServicios() {
+        try {
+            List<TipoServicio> servicios = controller.cargarTiposServicio();
+            DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+            model.addElement("Todos los Servicios");
+            for (TipoServicio ts : servicios) {
+                model.addElement(ts.toString());
+            }
+            cbListaTipoServicio.setModel(model);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar tipos de servicio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Método para definir las columnas y hacer la tabla NO EDITABLE
+    private void configurarTabla() {
+        String[] columnas = {
+            "N° Ticket", "Fecha Creación", "Estado Ticket", "Tipo Servicio",
+            "Descripción Servicio", "Nombre Cliente", "Fecha Asignación",
+            "Cargo", "Encargado Soporte"
+        };
+        // Sobreescribimos DefaultTableModel para que ninguna celda sea editable
+        tableModel = new DefaultTableModel(null, columnas) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        jTable1.setModel(tableModel);
+        cargarDatosEnTabla(controller.obtenerReporteGeneral());
+    }
+
+    private void cargarDatosEnTabla(List<ReporteController.ReporteData> listaReportes) {
+        tableModel.setRowCount(0);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        for (ReporteController.ReporteData data : listaReportes) {
+            Object[] fila = new Object[9];
+            fila[0] = data.getNumeroTicket();
+            fila[1] = dateFormat.format(data.getFechaCreacion());
+            fila[2] = data.getEstadoTicket();
+            fila[3] = data.getTipoServicio();
+            fila[4] = data.getDescripcionServicio();
+            fila[5] = data.getNombreCliente();
+            fila[6] = (data.getFechaAsignacion() != null) ? dateFormat.format(data.getFechaAsignacion()) : "N/A";
+            fila[7] = data.getCargoEncargado();
+            fila[8] = data.getNombreEncargadoSoporte();
+            tableModel.addRow(fila);
+        }
+    }
+
+    // Método para RESTABLECER el estado inicial de la vista
+    private void restablecerEstadoInicial() {
+        // 1. Deseleccionar cualquier fila y volver al filtro "Todos los Servicios"
+        jTable1.clearSelection();
+        cbListaTipoServicio.setSelectedItem("Todos los Servicios");
+        // 2. Recargar los datos generales
+        cargarDatosEnTabla(controller.obtenerReporteGeneral());
+        // 3. Ocultar el botón individual y mostrar el botón general
+        btnGenerarReporte.setVisible(false);
+        btnGenerarReporteGeneral.setVisible(true);
+    }
+
+    // Listener para ALTERNAR la visibilidad de los botones
+    private void agregarListenerSeleccionTabla() {
+        ListSelectionModel selectionModel = jTable1.getSelectionModel();
+        selectionModel.addListSelectionListener((ListSelectionEvent e) -> {
+            if (!e.getValueIsAdjusting()) {
+                boolean filaSeleccionada = jTable1.getSelectedRow() != -1;
+                // Si hay fila seleccionada: Muestra Individual, Oculta General
+                btnGenerarReporte.setVisible(filaSeleccionada);
+                // Si no hay fila seleccionada: Muestra General, Oculta Individual
+                btnGenerarReporteGeneral.setVisible(!filaSeleccionada);
+            }
+        });
     }
 
     /**
@@ -59,6 +156,11 @@ public class jFrameGenerarReporte extends javax.swing.JFrame {
         lblTipoServicio.setText("Tipo de Servicio");
 
         cbListaTipoServicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbListaTipoServicio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbListaTipoServicioActionPerformed(evt);
+            }
+        });
 
         jTable1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -114,19 +216,73 @@ public class jFrameGenerarReporte extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
-        // TODO add your handling code here:
+
+        //Llamamos a la ventana de tecnico
         jFrameMenuTecnico vTecnico = new jFrameMenuTecnico();
+        //La hacemos visible
         vTecnico.setVisible(true);
+        //Ocultamos cerramos la ventana actual
         this.dispose();
     }//GEN-LAST:event_btnAtrasActionPerformed
 
     private void btnGenerarReporteGeneralActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReporteGeneralActionPerformed
-        // TODO add your handling code here:
+        // Recargamos la tabla con el filtro actual (opcional, pero asegura los datos)
+        cbListaTipoServicioActionPerformed(evt);
+        // 1. Generar Reporte General
+        controller.generarPDFReporteGeneral(tableModel);
+        // 2. Restaurar el estado inicial después del mensaje de éxito
+        restablecerEstadoInicial();
     }//GEN-LAST:event_btnGenerarReporteGeneralActionPerformed
 
     private void btnGenerarReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReporteActionPerformed
-        // TODO add your handling code here:
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada != -1) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                // Extracción y parseo de datos de la fila
+                Date fechaCreacion = dateFormat.parse((String) tableModel.getValueAt(filaSeleccionada, 1));
+                String fechaAsignacionStr = (String) tableModel.getValueAt(filaSeleccionada, 6);
+                Date fechaAsignacion = fechaAsignacionStr.equals("N/A") ? null : dateFormat.parse(fechaAsignacionStr);
+
+                // Creación del objeto ReporteData
+                ReporteController.ReporteData reporteSeleccionado = new ReporteController.ReporteData(
+                        (String) tableModel.getValueAt(filaSeleccionada, 0),
+                        fechaCreacion,
+                        (String) tableModel.getValueAt(filaSeleccionada, 2),
+                        (String) tableModel.getValueAt(filaSeleccionada, 3),
+                        (String) tableModel.getValueAt(filaSeleccionada, 4),
+                        (String) tableModel.getValueAt(filaSeleccionada, 5),
+                        fechaAsignacion,
+                        (String) tableModel.getValueAt(filaSeleccionada, 7),
+                        (String) tableModel.getValueAt(filaSeleccionada, 8)
+                );
+
+                // 1. Generar El Ticket
+                controller.generarPDFReporteIndividual(reporteSeleccionado);
+                // 2. RESTABLECER ESTADO INICIAL DESPUÉS DEL MENSAJE DE ÉXITO
+                restablecerEstadoInicial();
+
+            } catch (java.text.ParseException ex) {
+                JOptionPane.showMessageDialog(this, "Error al parsear la fecha: " + ex.getMessage(), "Error de Datos", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnGenerarReporteActionPerformed
+
+    private void cbListaTipoServicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbListaTipoServicioActionPerformed
+        String tipoServicioSeleccionado = (String) cbListaTipoServicio.getSelectedItem();
+
+        // 1. Lógica para filtrar o cargar reporte general
+        if (tipoServicioSeleccionado == null || tipoServicioSeleccionado.equals("Todos los Servicios")) {
+            cargarDatosEnTabla(controller.obtenerReporteGeneral());
+        } else {
+            cargarDatosEnTabla(controller.obtenerReporteFiltrado(tipoServicioSeleccionado));
+        }
+
+        // 2. Restablece el estado de los botones (Muestra General, Oculta Individual)
+        jTable1.clearSelection();
+        btnGenerarReporte.setVisible(false);
+        btnGenerarReporteGeneral.setVisible(true);
+    }//GEN-LAST:event_cbListaTipoServicioActionPerformed
 
     /**
      * @param args the command line arguments

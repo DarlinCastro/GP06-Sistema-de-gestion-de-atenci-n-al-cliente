@@ -2,6 +2,7 @@ package capa_vista;
 
 import capa_vista.jFrameMenuTecnico;
 import capa_controladora.SolicitudController;
+import javax.swing.JFrame;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -13,7 +14,6 @@ import capa_controladora.SolicitudController;
  */
 public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
 
-// Referencia al Controller inyectada
     private SolicitudController controlador;
 
     public jFrameSeguimientoSolicitud() {
@@ -227,8 +227,8 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
 
     private void btnActualizarSolicitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarSolicitudActionPerformed
         if (controlador != null) {
-            controlador.actualizarDesdeVista();
-        }        
+            controlador.manejarBotonActualizar();
+        }
     }//GEN-LAST:event_btnActualizarSolicitudActionPerformed
 
     private void btnCancelarSolicitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarSolicitudActionPerformed

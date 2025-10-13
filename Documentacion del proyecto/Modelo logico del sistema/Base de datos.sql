@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     3/10/2025 20:47:46                           */
+/* Created on:     12/10/2025 01:35:41 (Consolidado)            */
 /*==============================================================*/
 
 /*==============================================================*/
@@ -106,11 +106,12 @@ IDTICKET
 );
 
 /*==============================================================*/
-/* Table: TICKET                                                */
+/* Table: TICKET (MODIFICADA para incluir IDUSUARIO)            */
 /*==============================================================*/
 create table TICKET (
     IDTICKET               SERIAL                not null,
     IDESTADOTICKET         INT4                  not null,
+    IDUSUARIO              INT4                  not null, -- Agregado de crebas.sql
     FECHAASIGNACION        DATE                  not null,
     NUMEROTICKET           CHAR(5)               not null,
     constraint PK_TICKET primary key (IDTICKET)
@@ -128,6 +129,13 @@ IDTICKET
 /*==============================================================*/
 create  index CONTIENE_FK on TICKET (
 IDESTADOTICKET
+);
+
+/*==============================================================*/
+/* Index: DA_SEGUIMIENTO_FK (Agregado de crebas.sql)            */
+/*==============================================================*/
+create  index DA_SEGUIMIENTO_FK on TICKET (
+IDUSUARIO
 );
 
 /*==============================================================*/
@@ -224,6 +232,11 @@ alter table TICKET
    add constraint FK_TICKET_CONTIENE_ESTADO_T foreign key (IDESTADOTICKET)
       references ESTADO_TICKET (IDESTADOTICKET)
       on delete restrict on update restrict;
+      
+alter table TICKET
+   add constraint FK_TICKET_DA_SEGUIM_USUARIO foreign key (IDUSUARIO) -- Agregado de crebas.sql
+      references USUARIO (IDUSUARIO)
+      on delete restrict on update restrict;
 
 alter table USUARIO
    add constraint FK_USUARIO_PERTENECE_TIPO_USU foreign key (IDTIPOUSUARIO)
@@ -266,11 +279,35 @@ INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Soporte de conectividad     
 INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Instalación, configuración y actualización de software interno                      ');
 INSERT INTO TIPO_SERVICIO (NOMBRESERVICIO) VALUES ('Recuperación de acceso                                                            ');
 
--- Tabla PASWORD
--- P = Programador, C = Cliente, T = Técnico, A = Admin
-INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('progpass', 'P-AB00001');
-INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('clipass1', 'C-AC00001');
-INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('clipass2', 'C-AC00002');
-INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('tecpass1', 'T-FD00001');
-INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('tecpass2', 'T-FD00002');
-INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('admin123', 'A-JF00001');
+-- Tabla PASSWORD
+-- 10 Clientes (C-) 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('securecliw', 'C-MA00014'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('passclient', 'C-NB00015'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('miclave123', 'C-OC00016'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('empresa#04', 'C-PD00017'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('datos2025 ', 'C-QE00018'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('cli_pass06', 'C-RF00019'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('usuario789', 'C-SG00020'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('claveunica', 'C-TH00021'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('client_09v', 'C-UI00022'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('client_10_', 'C-VJ00023'); 
+
+-- 3 Administradores (A-) 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('superadmin', 'A-WK00002'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('manager#2 ', 'A-XL00003');  
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('chief_it3 ', 'A-YM00004');  
+
+-- 5 Técnicos (T-) 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('tecsupport', 'T-ZN00020'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('fieldtech5', 'T-AO00021'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('hardwarefi', 'T-BP00022'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('support#08', 'T-CQ00023'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('tec_master', 'T-DR00024'); 
+
+-- 6 Programadores (P-) 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('dev_code9', 'P-ES00003'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('prog_db_y', 'P-FT00004'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('fullstack', 'P-GU00005'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('coderpass', 'P-HV00006'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('backenddX', 'P-IW00007'); 
+INSERT INTO PASWORD (CLAVEACCESO, IDENTIFICADOR) VALUES ('git_commi', 'P-JX00008'); 

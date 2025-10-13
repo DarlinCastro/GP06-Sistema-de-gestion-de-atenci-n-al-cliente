@@ -53,6 +53,11 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
 
         btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnAtras.setText("Atras");
+        btnAtras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtrasActionPerformed(evt);
+            }
+        });
 
         lblMenuTecYPro.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblMenuTecYPro.setText("Menu Tecnico y Programador");
@@ -114,6 +119,13 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
         vReporte.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnGenerarReportesActionPerformed
+
+    private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
+        // TODO add your handling code here:
+        jFrameLogin vLogin = new jFrameLogin ();
+        vLogin.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnAtrasActionPerformed
 
     /**
      * @param args the command line arguments

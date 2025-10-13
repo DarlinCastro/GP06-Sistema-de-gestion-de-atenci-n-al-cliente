@@ -20,6 +20,11 @@ public class TipoServicio {
         this.nombreServicio = nombreServicio != null ? nombreServicio.trim() : "";
     }
 
+    public void setNombreServicio(String nombreServicio) {
+        this.nombreServicio = nombreServicio;
+    }
+
+    
     public String getNombreServicio() {
         return nombreServicio;
     }

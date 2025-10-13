@@ -31,12 +31,44 @@ public class Solicitud {
         this.descripcion = descripcion != null ? descripcion.trim() : "";
     }
 
-    public Ticket getTicket() {
-        return ticket;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public void setTipoServicio(TipoServicio tipoServicio) {
+        this.tipoServicio = tipoServicio;
+    }
+
+    public void setEstadoSolicitud(EstadoSolicitud estadoSolicitud) {
+        this.estadoSolicitud = estadoSolicitud;
+    }
+
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public TipoServicio getTipoServicio() {
+        return tipoServicio;
     }
 
     public EstadoSolicitud getEstadoSolicitud() {
         return estadoSolicitud;
+    }
+
+    public Ticket getTicket() {
+        return ticket;
     }
 
     public Date getFechaCreacion() {
@@ -45,18 +77,6 @@ public class Solicitud {
 
     public String getDescripcion() {
         return descripcion;
-    }
-
-    public TipoServicio getTipoServicio() {
-        return tipoServicio;
-    }
-
-    public void setEstadoSolicitud(EstadoSolicitud estadoSolicitud) {
-        this.estadoSolicitud = estadoSolicitud;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
     }
 
     // Método CRUCIAL: Lo que se muestra en cbNTicket.
