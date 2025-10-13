@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package capa_controladora;
 
 import capa_vista.jFrameSeguimientoSolicitud;
-import capa_vista.jFrameMenuTecnico;
+import capa_vista.jFrameMenuTecnico; // Ya no se crea aquí, solo se importa
+// import capa_vista.jFrameMenuCliente; // No se necesita importar si solo usamos JFrame
 import base_datos.SolicitudDAO;
 import entidades.*;
 import java.awt.event.ActionEvent;
@@ -16,13 +13,14 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import java.util.Date;
 import java.util.ArrayList;
-import javax.swing.JFrame;
+import javax.swing.JFrame; 
 import java.sql.SQLException;
 
 public class SolicitudController implements ActionListener {
 
     private final jFrameSeguimientoSolicitud vista;
     private final SolicitudDAO dao;
+    private final JFrame ventanaOrigen; // <--- CORRECCIÓN 1: Referencia a la ventana anterior
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     private Solicitud solicitudActual;
@@ -31,9 +29,11 @@ public class SolicitudController implements ActionListener {
     private static final String ESTADO_CANCELADO_NOMBRE = "Cancelado";
     private static final String SELECCIONE_ITEM = "Seleccione ";
 
-    public SolicitudController(jFrameSeguimientoSolicitud vista) {
+    // <--- CORRECCIÓN 2: Constructor modificado para recibir la ventana de origen
+    public SolicitudController(jFrameSeguimientoSolicitud vista, JFrame ventanaOrigen) {
         this.vista = vista;
         this.dao = new SolicitudDAO();
+        this.ventanaOrigen = ventanaOrigen; // <--- Asigna la referencia
         this.vista.setControlador(this);
         inicializarComponentes();
         cargarDatosIniciales();
@@ -352,14 +352,16 @@ public class SolicitudController implements ActionListener {
         vista.setLocationRelativeTo(null);
     }
 
+    // <--- CORRECCIÓN 3: irAtras() ahora regresa a la ventana de origen
     public void irAtras() {
         vista.dispose();
-        try {
-            jFrameMenuTecnico nuevoMenu = new jFrameMenuTecnico();
-            nuevoMenu.setVisible(true);
-            nuevoMenu.setLocationRelativeTo(null);
-        } catch (Exception e) {
-            System.err.println("Error al crear el nuevo menú técnico: " + e.getMessage());
+        if (ventanaOrigen != null) {
+            ventanaOrigen.setVisible(true);
+            ventanaOrigen.setLocationRelativeTo(null);
+        } else {
+            // Manejo de error o comportamiento por defecto si no se pasó la ventana origen
+            JOptionPane.showMessageDialog(null, "Error de navegación: No se encontró la ventana anterior.", "Error", JOptionPane.ERROR_MESSAGE);
+            // Podrías forzar la apertura del menú técnico/login aquí si fuera estrictamente necesario
         }
     }
 }

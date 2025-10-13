@@ -106,23 +106,23 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
         // 1. Crea la interfaz visual (la Vista)
         jFrameSeguimientoSolicitud vSeguimiento = new jFrameSeguimientoSolicitud();
         // 2. Crea el Controlador, pasándole la Vista
-        SolicitudController controlador = new SolicitudController(vSeguimiento);
+        SolicitudController controlador = new SolicitudController(vSeguimiento, this);
         // 3. Le pedimos al Controller que inicie la Vista y la lógica
         controlador.iniciar();
         // 4. Cierra la ventana actual
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_btnSeguimientoActionPerformed
 
     private void btnGenerarReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReportesActionPerformed
-        // TODO add your handling code here:
-        jFrameGenerarReporte vReporte = new jFrameGenerarReporte();
+        // Línea MODIFICADA: Ahora pasamos 'this' para que la ventana de reportes sepa quién la llamó
+        jFrameGenerarReporte vReporte = new jFrameGenerarReporte(this);
         vReporte.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnGenerarReportesActionPerformed
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
         // TODO add your handling code here:
-        jFrameLogin vLogin = new jFrameLogin ();
+        jFrameLogin vLogin = new jFrameLogin();
         vLogin.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnAtrasActionPerformed

@@ -1,3 +1,5 @@
+package capa_vista;
+
 
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;

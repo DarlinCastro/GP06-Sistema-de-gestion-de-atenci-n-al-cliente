@@ -4,7 +4,6 @@ package capa_vista;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author RYZEN
@@ -35,9 +34,19 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
 
         btnGestionarUsuarios.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnGestionarUsuarios.setText("Gestionar Usuarios");
+        btnGestionarUsuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGestionarUsuariosActionPerformed(evt);
+            }
+        });
 
         btnAsignarSolicitudes.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnAsignarSolicitudes.setText("Asignar Solicitudes");
+        btnAsignarSolicitudes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAsignarSolicitudesActionPerformed(evt);
+            }
+        });
 
         lblMenuAdministrador.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblMenuAdministrador.setText("Menu Administrador");
@@ -52,6 +61,11 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
 
         btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnAtras.setText("Atras");
+        btnAtras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtrasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -93,8 +107,32 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGenerarReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReportesActionPerformed
-        // TODO add your handling code here:
+        // Línea MODIFICADA: Ahora pasamos 'this' para que la ventana de reportes sepa quién la llamó
+        jFrameGenerarReporte vReporte = new jFrameGenerarReporte(this);
+        vReporte.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnGenerarReportesActionPerformed
+
+    private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
+        // TODO add your handling code here:
+        jFrameLogin vLogin = new jFrameLogin();
+        vLogin.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void btnAsignarSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignarSolicitudesActionPerformed
+        // TODO add your handling code here:
+        jFrameAsignarSolicitud vAsignarSolicitud = new jFrameAsignarSolicitud();
+        vAsignarSolicitud.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnAsignarSolicitudesActionPerformed
+
+    private void btnGestionarUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionarUsuariosActionPerformed
+        // TODO add your handling code here:
+        jFrameGestionarUsuarios vGestionarUsuarios = new jFrameGestionarUsuarios();
+        vGestionarUsuarios.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnGestionarUsuariosActionPerformed
 
     /**
      * @param args the command line arguments

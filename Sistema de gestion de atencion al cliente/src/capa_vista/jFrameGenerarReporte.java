@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JFrame;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -21,14 +22,24 @@ import javax.swing.table.DefaultTableModel;
  */
 public class jFrameGenerarReporte extends javax.swing.JFrame {
 
+    // NUEVO ATRIBUTO: Para guardar la referencia de la ventana que nos llamó
+    private JFrame frameAnterior; // Puede ser jFrameMenuAdmin o jFrameMenuTecnico
+
     private final ReporteController controller = new ReporteController();
     private DefaultTableModel tableModel;
 
+    // CONSTRUCTOR ESTÁNDAR (MANTENIDO POR COMPATIBILIDAD)
     public jFrameGenerarReporte() {
         initComponents();
         inicializarComponentesPersonalizados();
     }
-    
+
+    // NUEVO CONSTRUCTOR SOBRECARGADO: Recibe la ventana anterior
+    public jFrameGenerarReporte(JFrame frameAnterior) {
+        initComponents();
+        inicializarComponentesPersonalizados();
+        this.frameAnterior = frameAnterior; // Guarda la referencia del llamador
+    }
     // MÉTODOS DE INICIALIZACIÓN Y CONFIGURACIÓN
 
     private void inicializarComponentesPersonalizados() {
@@ -216,13 +227,17 @@ public class jFrameGenerarReporte extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
-
-        //Llamamos a la ventana de tecnico
-        jFrameMenuTecnico vTecnico = new jFrameMenuTecnico();
-        //La hacemos visible
-        vTecnico.setVisible(true);
-        //Ocultamos cerramos la ventana actual
-        this.dispose();
+        // Si tenemos la referencia de la ventana anterior, la mostramos.
+        if (frameAnterior != null) {
+            frameAnterior.setVisible(true); // Muestra MenuAdmin o MenuTecnico
+            this.dispose();                 // Cierra la ventana de reportes
+        } else {
+            // Caso de emergencia o si se abrió con el constructor vacío.
+            JOptionPane.showMessageDialog(this, "No se pudo determinar la pantalla anterior. Volviendo al Login.", "Error de Navegación", JOptionPane.WARNING_MESSAGE);
+            // Opción: Volver al login si no hay frameAnterior
+            new jFrameLogin().setVisible(true);
+            this.dispose();
+        }
     }//GEN-LAST:event_btnAtrasActionPerformed
 
     private void btnGenerarReporteGeneralActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReporteGeneralActionPerformed
