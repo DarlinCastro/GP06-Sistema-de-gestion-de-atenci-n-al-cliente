@@ -19,6 +19,10 @@ public class EstadoSolicitud {
         this.estadoSolicitud = estadoSolicitud != null ? estadoSolicitud.trim() : "";
     }
 
+    public void setEstadoSolicitud(String estadoSolicitud) {
+        this.estadoSolicitud = estadoSolicitud;
+    }
+
     public String getEstadoSolicitud() {
         return estadoSolicitud;
     }

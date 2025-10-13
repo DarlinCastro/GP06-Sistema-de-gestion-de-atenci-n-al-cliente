@@ -21,6 +21,10 @@ public class EstadoTicket {
         this.nivelPrioridad = nivelPrioridad != null ? nivelPrioridad.trim() : "";
     }
 
+    public void setNivelPrioridad(String nivelPrioridad) {
+        this.nivelPrioridad = nivelPrioridad;
+    }
+
     public String getNivelPrioridad() {
         return nivelPrioridad;
     }

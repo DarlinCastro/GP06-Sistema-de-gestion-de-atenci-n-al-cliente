@@ -5,67 +5,76 @@
 package capa_controladora;
 
 import capa_vista.jFrameSeguimientoSolicitud;
-import capa_vista.jFrameMenuTecnico; 
+import capa_vista.jFrameMenuTecnico;
 import base_datos.SolicitudDAO;
 import entidades.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import java.util.Optional;
+import java.util.Date;
+import java.util.ArrayList;
+import javax.swing.JFrame;
+import java.sql.SQLException;
 
-public class SolicitudController implements ActionListener{
+public class SolicitudController implements ActionListener {
 
     private final jFrameSeguimientoSolicitud vista;
     private final SolicitudDAO dao;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-    private Usuario usuarioSeleccionado;
-    private Solicitud solicitudActual;  
-    
-    // Lista de estados cargada una sola vez para llenar el ComboBox al seleccionar un ticket.
-    private List<EstadoSolicitud> listaTodosLosEstados; 
+    private Solicitud solicitudActual;
+    private List<EstadoSolicitud> listaTodosLosEstados;
+
+    private static final String ESTADO_CANCELADO_NOMBRE = "Cancelado";
+    private static final String SELECCIONE_ITEM = "Seleccione ";
 
     public SolicitudController(jFrameSeguimientoSolicitud vista) {
         this.vista = vista;
         this.dao = new SolicitudDAO();
-        this.vista.setControlador(this); 
-        inicializarComponentes(); 
-        cargarDatosIniciales(); 
+        this.vista.setControlador(this);
+        inicializarComponentes();
+        cargarDatosIniciales();
     }
 
-// -----------------------------------------------------------------------------
-// --- Inicialización y Carga de Datos ---
-// -----------------------------------------------------------------------------
     private void inicializarComponentes() {
-
-        vista.getCbCargo().addActionListener(this); 
+        
+        // Enlazar botones y combos a este controlador
+        vista.getCbCargo().addActionListener(this);
         vista.getCbNombre().addActionListener(this);
         vista.getCbNTicket().addActionListener(this);
+        vista.getBtnActualizarSolicitud().addActionListener(this);
+
+        // Bloquear campos de solo lectura
         vista.getTxtFechaCreacion().setEditable(false);
         vista.getTxtTipoServicio().setEditable(false);
         vista.getTxtDescripcion().setEditable(false);
         vista.getTxtNivelPrioridad().setEditable(false);
     }
 
+    /**
+     * Resetea la interfaz de usuario a su estado inicial.
+     */
     private void cargarDatosIniciales() {
+        // Carga de datos de la base de datos
         cargarCargos();
-        
-        // CORRECCIÓN CLAVE 1: Inicializamos la lista de estados aquí, 
-        // pero NO cargamos el ComboBox de la Vista.
-        cargarListaTodosLosEstados(); 
-        
-        // Limpia combos dependientes al inicio
+        cargarListaTodosLosEstados();
+
+        // Reseteo de ComboBoxes dependientes
         vista.getCbNombre().removeAllItems();
         vista.getCbNTicket().removeAllItems();
-        vista.getCbNombre().addItem("Seleccione Nombre");
-        vista.getCbNTicket().addItem("Seleccione Ticket");
-        
-        // CORRECCIÓN CLAVE 2: Aseguramos que el combo de Estado de Solicitud esté vacío
-        vista.getCbEstadoSolicitud().removeAllItems(); 
+        vista.getCbNombre().addItem(SELECCIONE_ITEM + "Nombre");
+        vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
+        vista.getCbEstadoSolicitud().removeAllItems();
+
+        if (vista.getCbCargo().getItemCount() > 0) {
+            vista.getCbCargo().setSelectedIndex(0);
+        }
+
+        // Limpieza de campos de detalle
+        limpiarDetalleCampos();
     }
 
     private void cargarCargos() {
@@ -73,55 +82,35 @@ public class SolicitudController implements ActionListener{
             List<TipoUsuario> cargos = dao.obtenerCargos();
             JComboBox<String> cb = vista.getCbCargo();
             cb.removeAllItems();
-            cb.addItem("Seleccione Cargo"); 
+            cb.addItem(SELECCIONE_ITEM + "Cargo");
             for (TipoUsuario tu : cargos) {
-                cb.addItem(tu.toString().trim());
+                cb.addItem(tu.toString());
             }
         } catch (Exception ex) {
             System.err.println("Error al cargar Cargos: " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista, "Error al cargar Cargos desde la BD.", "Error de Carga", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void cargarListaTodosLosEstados() {
-        // Obtenemos la lista completa de estados desde la BD y la guardamos
         try {
             listaTodosLosEstados = dao.obtenerEstadosSolicitud();
         } catch (Exception ex) {
             System.err.println("Error al cargar Lista de Estados: " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista, "Error al cargar estados de solicitud.", "Error de Carga", JOptionPane.ERROR_MESSAGE);
-            listaTodosLosEstados = null;
+            listaTodosLosEstados = new ArrayList<>();
         }
     }
-    
-    private void limpiarVista() {
-        // 1. Resetear/limpiar campos de texto (detalle de la solicitud)
+
+    private void limpiarDetalleCampos() {
         vista.getTxtFechaCreacion().setText("");
         vista.getTxtTipoServicio().setText("");
         vista.getTxtDescripcion().setText("");
         vista.getTxtNivelPrioridad().setText("");
-
-        // 2. Resetear el estado de la solicitud cargada
-        solicitudActual = null;
-        usuarioSeleccionado = null;
-
-        // 3. Resetear ComboBoxes dependientes (Nombre y Ticket)
-        vista.getCbNombre().removeAllItems();
-        vista.getCbNTicket().removeAllItems();
-        vista.getCbNombre().addItem("Seleccione Nombre");
-        vista.getCbNTicket().addItem("Seleccione Ticket");
-        
-        // 4. CORRECCIÓN CLAVE 3: Asegurar que el combo de Estado esté VACÍO
         vista.getCbEstadoSolicitud().removeAllItems();
-
-        // 5. Resetear Cargo y FORZAR la limpieza de dependencias.
-        if (vista.getCbCargo().getItemCount() > 0) {
-            vista.getCbCargo().setSelectedIndex(0);
-        }
-        
-        manejarSeleccionCargo(); 
+        solicitudActual = null;
     }
-        @Override
+
+    // ------------------- Manejo de Eventos -------------------
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == vista.getCbCargo()) {
             manejarSeleccionCargo();
@@ -129,33 +118,34 @@ public class SolicitudController implements ActionListener{
             manejarSeleccionNombre();
         } else if (e.getSource() == vista.getCbNTicket()) {
             manejarSeleccionTicket();
-        } 
-        // El botón Actualizar/Cancelar es llamado directamente por la Vista (ver abajo).
+        } else if (e.getSource() == vista.getBtnActualizarSolicitud()) {
+            manejarBotonActualizar(); // Llamamos al manejador del botón
+        }
     }
-    
-    // ... (manejarSeleccionCargo y manejarSeleccionNombre sin cambios) ...
 
     private void manejarSeleccionCargo() {
         String cargoSeleccionado = (String) vista.getCbCargo().getSelectedItem();
-        if (cargoSeleccionado == null || cargoSeleccionado.trim().isEmpty() || cargoSeleccionado.equals("Seleccione Cargo")) {
+
+        if (cargoSeleccionado == null || cargoSeleccionado.equals(SELECCIONE_ITEM + "Cargo")) {
             vista.getCbNombre().removeAllItems();
+            vista.getCbNombre().addItem(SELECCIONE_ITEM + "Nombre");
             vista.getCbNTicket().removeAllItems();
-            vista.getCbNombre().addItem("Seleccione Nombre");
-            vista.getCbNTicket().addItem("Seleccione Ticket");
+            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
             limpiarDetalleCampos();
             return;
         }
 
         try {
-            List<Usuario> usuarios = dao.obtenerUsuariosPorCargo(cargoSeleccionado);
+            List<Usuario> usuarios = dao.obtenerUsuariosPorCargo(cargoSeleccionado.trim());
             JComboBox<String> cb = vista.getCbNombre();
             cb.removeAllItems();
-            cb.addItem("Seleccione Nombre");
+            cb.addItem(SELECCIONE_ITEM + "Nombre");
+
             for (Usuario u : usuarios) {
-                cb.addItem(u.toString().trim());
+                cb.addItem(u.toString());
             }
             vista.getCbNTicket().removeAllItems();
-            vista.getCbNTicket().addItem("Seleccione Ticket");
+            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
             limpiarDetalleCampos();
         } catch (Exception ex) {
             System.err.println("Error al cargar Nombres: " + ex.getMessage());
@@ -166,47 +156,52 @@ public class SolicitudController implements ActionListener{
         String nombreCompletoSeleccionado = (String) vista.getCbNombre().getSelectedItem();
         String cargo = (String) vista.getCbCargo().getSelectedItem();
 
-        if (nombreCompletoSeleccionado == null || nombreCompletoSeleccionado.trim().isEmpty() || nombreCompletoSeleccionado.equals("Seleccione Nombre")) {
+        if (nombreCompletoSeleccionado == null || nombreCompletoSeleccionado.equals(SELECCIONE_ITEM + "Nombre")) {
             vista.getCbNTicket().removeAllItems();
-            vista.getCbNTicket().addItem("Seleccione Ticket");
+            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
             limpiarDetalleCampos();
             return;
         }
 
         try {
-            Optional<Usuario> usuarioOpt = dao.obtenerUsuariosPorCargo(cargo)
-                    .stream()
-                    .filter(u -> u.toString().trim().equals(nombreCompletoSeleccionado.trim()))
-                    .findFirst();
+            int idUsuario = dao.obtenerIdUsuarioPorNombre(nombreCompletoSeleccionado.trim());
 
-            if (usuarioOpt.isEmpty()) {
-                usuarioSeleccionado = null;
+            if (idUsuario == 0) {
+                vista.getCbNTicket().removeAllItems();
+                vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
+                limpiarDetalleCampos();
                 return;
             }
 
-            usuarioSeleccionado = usuarioOpt.get();
+            List<Solicitud> solicitudes;
+            String cargoTrim = cargo.trim();
 
-            List<Solicitud> solicitudes = dao.obtenerSolicitudesPorUsuario(usuarioSeleccionado);
+            if ("Programador".equalsIgnoreCase(cargoTrim) || "Tecnico".equalsIgnoreCase(cargoTrim) || "Técnico".equalsIgnoreCase(cargoTrim)) {
+                solicitudes = dao.obtenerSolicitudesAsignadasPorId(idUsuario);
+            } else {
+                solicitudes = dao.obtenerSolicitudesPorUsuarioId(idUsuario);
+            }
+
             JComboBox<String> cb = vista.getCbNTicket();
             cb.removeAllItems();
-            cb.addItem("Seleccione Ticket");
+            cb.addItem(SELECCIONE_ITEM + "Ticket");
 
             for (Solicitud s : solicitudes) {
                 cb.addItem(s.getTicket().getNumeroTicket().trim());
             }
-            solicitudActual = null; 
             limpiarDetalleCampos();
         } catch (Exception ex) {
             System.err.println("Error al cargar Tickets: " + ex.getMessage());
+            vista.getCbNTicket().removeAllItems();
+            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
+            limpiarDetalleCampos();
         }
     }
 
     private void manejarSeleccionTicket() {
         String numeroTicket = (String) vista.getCbNTicket().getSelectedItem();
-        
-        // Si se deselecciona el ticket o es el placeholder
-        if (numeroTicket == null || numeroTicket.trim().isEmpty() || numeroTicket.equals("Seleccione Ticket")) {
-            solicitudActual = null;
+
+        if (numeroTicket == null || numeroTicket.equals(SELECCIONE_ITEM + "Ticket")) {
             limpiarDetalleCampos();
             return;
         }
@@ -215,123 +210,142 @@ public class SolicitudController implements ActionListener{
             solicitudActual = dao.obtenerSolicitudPorTicket(numeroTicket.trim());
 
             if (solicitudActual != null) {
-                // Rellenar campos de lectura
-                vista.getTxtFechaCreacion().setText(dateFormat.format(solicitudActual.getFechaCreacion()));
+                Date fechaCreacion = solicitudActual.getFechaCreacion();
+                vista.getTxtFechaCreacion().setText(fechaCreacion != null ? dateFormat.format(fechaCreacion) : "");
                 vista.getTxtTipoServicio().setText(solicitudActual.getTipoServicio().toString().trim());
                 vista.getTxtDescripcion().setText(solicitudActual.getDescripcion().trim());
-                vista.getTxtNivelPrioridad().setText(solicitudActual.getTicket().getEstadoTicket().toString().trim()); 
-                
-                // CORRECCIÓN CLAVE 4: Llenar el ComboBox y seleccionar el estado
+                vista.getTxtNivelPrioridad().setText(solicitudActual.getTicket().getEstadoTicket().toString().trim());
                 llenarYCargarEstadoSolicitud(solicitudActual.getEstadoSolicitud().toString().trim());
-                
             } else {
-                 limpiarDetalleCampos();
+                limpiarDetalleCampos();
             }
         } catch (Exception ex) {
             System.err.println("Error al cargar datos del Ticket: " + ex.getMessage());
             JOptionPane.showMessageDialog(vista, "Error al cargar detalles del Ticket.", "Error BD", JOptionPane.ERROR_MESSAGE);
-            solicitudActual = null;
             limpiarDetalleCampos();
         }
     }
-    
-    /**
-     * Llena el ComboBox de Estado y selecciona el estado actual del ticket.
-     */
+
     private void llenarYCargarEstadoSolicitud(String estadoActual) {
         JComboBox<String> cb = vista.getCbEstadoSolicitud();
         cb.removeAllItems();
-        
+
         if (listaTodosLosEstados != null) {
-             // Agregamos un placeholder inicial, aunque la lógica de actualización lo valide
-            cb.addItem("Seleccione Estado"); 
+            cb.addItem(SELECCIONE_ITEM + "Estado");
             for (EstadoSolicitud es : listaTodosLosEstados) {
                 cb.addItem(es.toString().trim());
             }
-            // Seleccionamos el estado que vino de la base de datos
             cb.setSelectedItem(estadoActual);
         }
     }
-    
-    // Método auxiliar para limpiar solo los campos de detalle
-    private void limpiarDetalleCampos(){
-        vista.getTxtFechaCreacion().setText("");
-        vista.getTxtTipoServicio().setText("");
-        vista.getTxtDescripcion().setText("");
-        vista.getTxtNivelPrioridad().setText("");
-        solicitudActual = null;
-        
-        // CORRECCIÓN CLAVE 5: Vaciar el combo de estado al limpiar los detalles
-        vista.getCbEstadoSolicitud().removeAllItems();
+
+    // ----------------------------------------------------------------------
+    //  MANEJADOR DEL BOTÓN ACTUALIZAR
+    // ----------------------------------------------------------------------
+    /**
+     * Valida los campos y llama a la lógica de ejecución. Garantiza una ÚNICA advertencia si los datos están incompletos.
+     */
+    public void manejarBotonActualizar() {
+
+        // --- 1. VALIDACIÓN CON ADVERTENCIA ÚNICA ---
+        // A. Advertencia 1: Si no hay ticket seleccionado
+        if (solicitudActual == null) {
+            JOptionPane.showMessageDialog(vista, "Seleccione un ticket para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String nuevoEstadoStr = (String) vista.getCbEstadoSolicitud().getSelectedItem();
+
+        // B. Advertencia 2: Si el ticket está seleccionado pero el estado no
+        if (nuevoEstadoStr == null || nuevoEstadoStr.equals(SELECCIONE_ITEM + "Estado")) {
+            JOptionPane.showMessageDialog(vista, "Debe seleccionar un nuevo estado para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // 2. Si las validaciones pasan, se llama a la lógica de ejecución
+        ejecutarActualizacion(nuevoEstadoStr);
     }
 
-// -----------------------------------------------------------------------------
-// --- Lógica de Actualización (Botones) ---
-// -----------------------------------------------------------------------------
-    private void manejarActualizarSolicitud() {
-        if (solicitudActual == null || solicitudActual.getTicket() == null) {
-            JOptionPane.showMessageDialog(vista, "Debe seleccionar un ticket para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String nuevoEstadoString = (String) vista.getCbEstadoSolicitud().getSelectedItem();
-        String numeroTicket = solicitudActual.getTicket().getNumeroTicket().trim();
-
-        // Validación de que se haya seleccionado un estado válido.
-        if (nuevoEstadoString == null || nuevoEstadoString.trim().isEmpty() || nuevoEstadoString.equals("Seleccione Estado")) {  
-            JOptionPane.showMessageDialog(vista, "Seleccione un estado válido para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String estadoAEnviar = nuevoEstadoString.trim();
-
+    // ----------------------------------------------------------------------
+    // LÓGICA CENTRAL DE EJECUCIÓN (USADA POR ACTUALIZAR Y CANCELAR)
+    // ----------------------------------------------------------------------
+    /**
+     * Ejecuta la actualización en la BD y maneja el flujo de éxito o error.
+     */
+    private void ejecutarActualizacion(String nuevoEstadoStr) {
         try {
-            dao.actualizarEstadoSolicitud(numeroTicket, estadoAEnviar);
+            // 1. OBTENER IDS NECESARIOS
+            int nuevoEstadoId = dao.obtenerIdEstadoPorNombre(nuevoEstadoStr);
+            if (nuevoEstadoId == 0) {
+                JOptionPane.showMessageDialog(vista, "Error: No se pudo encontrar el ID del estado seleccionado.", "Error Interno", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            JOptionPane.showMessageDialog(vista, "Estado de Solicitud actualizado con éxito a '" + estadoAEnviar + "'.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            
-            // LIMPIEZA DESPUÉS DEL ÉXITO, volviendo al estado de búsqueda (combo de estado se vacía).
-            limpiarVista(); 
+            String ticketNum = solicitudActual.getTicket().getNumeroTicket();
+            int idSolicitud = dao.obtenerIdSolicitudPorTicket(ticketNum);
 
-        } catch (SQLException ex) {
-            System.err.println("Error al actualizar estado de solicitud (Controller): " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista, "Error de base de datos al actualizar el estado: " + ex.getMessage(), "Error de Actualización", JOptionPane.ERROR_MESSAGE);
+            if (idSolicitud == 0) {
+                JOptionPane.showMessageDialog(vista, "Error: No se pudo encontrar el ID de la Solicitud para el ticket: " + ticketNum, "Error Interno", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // 2. Llamar al DAO para actualizar la base de datos
+            boolean exito = dao.actualizarEstadoSolicitud(idSolicitud, nuevoEstadoId);
+
+            if (exito) {
+                // 3. Feedback de éxito 
+                JOptionPane.showMessageDialog(vista,
+                        "El estado de la solicitud #" + ticketNum + " ha sido actualizado a: " + nuevoEstadoStr,
+                        "Actualización Exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                // Se reinicia el formulario a su estado normal sin advertencias posteriores.
+                cargarDatosIniciales();
+                return; // Termina la ejecución después del éxito.
+            } else {
+                JOptionPane.showMessageDialog(vista, "Fallo al actualizar el estado en la base de datos.", "Error de BD", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(vista, "Ocurrió un error al intentar actualizar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public void actualizarDesdeVista() {
-        manejarActualizarSolicitud();
-    }
-
+    // ----------------------------------------------------------------------
+    // LÓGICA DE CANCELACIÓN
+    // ----------------------------------------------------------------------
+    /**
+     * Lógica de Cancelación: Advertencia única si falta el ticket.
+     */
     public void cancelarSolicitudDesdeVista() {
-        if (solicitudActual == null || solicitudActual.getTicket() == null) {
-            JOptionPane.showMessageDialog(vista, "Debe seleccionar un ticket para cancelar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        // Validación: debe haber un ticket seleccionado
+        if (solicitudActual == null) {
+            JOptionPane.showMessageDialog(vista, "Seleccione un ticket para cancelar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        final String ESTADO_CANCELADO = "Cancelado";
-        String numeroTicket = solicitudActual.getTicket().getNumeroTicket().trim();
+        // 1. Forzar la selección del estado "Cancelado"
+        JComboBox<String> cbEstado = vista.getCbEstadoSolicitud();
 
-        try {
-            dao.actualizarEstadoSolicitud(numeroTicket, ESTADO_CANCELADO);
-
-            JOptionPane.showMessageDialog(vista, "Solicitud N° " + numeroTicket + " ha sido CANCELADA con éxito.", "Éxito de Cancelación", JOptionPane.INFORMATION_MESSAGE);
-            
-            // LIMPIEZA DESPUÉS DEL ÉXITO
-            limpiarVista(); 
-
-        } catch (SQLException ex) {
-            System.err.println("Error al cancelar solicitud: " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista,
-                    "Error al cancelar la solicitud: " + ex.getMessage(),
-                    "Error de Cancelación",
-                    JOptionPane.ERROR_MESSAGE);
+        boolean encontrado = false;
+        for (int i = 0; i < cbEstado.getItemCount(); i++) {
+            if (ESTADO_CANCELADO_NOMBRE.equalsIgnoreCase(cbEstado.getItemAt(i))) {
+                cbEstado.setSelectedIndex(i);
+                encontrado = true;
+                break;
+            }
         }
+
+        if (!encontrado) {
+            JOptionPane.showMessageDialog(vista, "El estado '" + ESTADO_CANCELADO_NOMBRE + "' no está disponible.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 2. Llamar a la lógica de ejecución (el estado ya está forzado a "Cancelado")
+        String estadoCancelado = (String) vista.getCbEstadoSolicitud().getSelectedItem();
+        ejecutarActualizacion(estadoCancelado);
     }
 
-// -----------------------------------------------------------------------------
-// --- Navegación ---
-// -----------------------------------------------------------------------------
+    // --- Métodos de Navegación ---
     public void iniciar() {
         vista.setVisible(true);
         vista.setTitle("Seguimiento y Actualización de Solicitudes");
@@ -340,7 +354,12 @@ public class SolicitudController implements ActionListener{
 
     public void irAtras() {
         vista.dispose();
-        jFrameMenuTecnico vTecnico = new jFrameMenuTecnico(); 
-        vTecnico.setVisible(true);
+        try {
+            jFrameMenuTecnico nuevoMenu = new jFrameMenuTecnico();
+            nuevoMenu.setVisible(true);
+            nuevoMenu.setLocationRelativeTo(null);
+        } catch (Exception e) {
+            System.err.println("Error al crear el nuevo menú técnico: " + e.getMessage());
+        }
     }
 }

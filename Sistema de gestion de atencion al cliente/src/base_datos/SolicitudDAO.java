@@ -11,220 +11,294 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Date;
 
 public class SolicitudDAO {
 
-    // --- Carga Inicial (Se mantiene para consistencia) ---
-    public List<EstadoSolicitud> obtenerEstadosSolicitud() {
-        List<EstadoSolicitud> estados = new ArrayList<>();
-        final String SQL = "SELECT ESTADOSOLICITUD FROM ESTADO_SOLICITUD";
+    // ----------------------------------------------------------------------
+    // --- MÉTODOS DE BÚSQUEDA DE ID (CRÍTICOS PARA LA ACTUALIZACIÓN) ---
+    // ----------------------------------------------------------------------
+    /**
+     *  Obtiene el ID de la Solicitud usando el número de Ticket. 
+     */
+    public int obtenerIdSolicitudPorTicket(String numeroTicket) throws SQLException {
+        int idSolicitud = 0;
+        String sql = "SELECT s.idsolicitud FROM SOLICITUD s JOIN TICKET t ON s.idticket = t.idticket WHERE LOWER(TRIM(t.numeroticket)) = LOWER(TRIM(?))";
 
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(SQL); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                estados.add(new EstadoSolicitud(rs.getString("ESTADOSOLICITUD").trim()));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener estados de solicitud: " + e.getMessage());
-        }
-        return estados;
-    }
+            pstmt.setString(1, numeroTicket);
 
-    public List<TipoUsuario> obtenerCargos() {
-        List<TipoUsuario> cargos = new ArrayList<>();
-        final String SQL = "SELECT CARGO FROM TIPO_USUARIO ORDER BY CARGO";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(SQL); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                cargos.add(new TipoUsuario(rs.getString("CARGO").trim()));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener cargos: " + e.getMessage());
-        }
-        return cargos;
-    }
-
-    public List<Usuario> obtenerUsuariosPorCargo(String cargo) {
-        List<Usuario> usuarios = new ArrayList<>();
-        final String SQL
-                = "SELECT u.NOMBRES, u.APELLIDOS, tu.CARGO "
-                + "FROM USUARIO u "
-                + "INNER JOIN TIPO_USUARIO tu ON u.IDTIPOUSUARIO = tu.IDTIPOUSUARIO "
-                + "WHERE tu.CARGO = ?";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(SQL)) {
-
-            ps.setString(1, cargo.trim());
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    TipoUsuario tipo = new TipoUsuario(rs.getString("CARGO").trim());
-
-                    Usuario usuario = new Usuario(
-                            rs.getString("NOMBRES").trim(),
-                            rs.getString("APELLIDOS").trim(),
-                            null,
-                            tipo,
-                            null
-                    );
-                    usuarios.add(usuario);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    idSolicitud = rs.getInt("idsolicitud");
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener usuarios por cargo: " + e.getMessage());
         }
-        return usuarios;
+        return idSolicitud;
     }
 
-    public List<Solicitud> obtenerSolicitudesPorUsuario(Usuario usuario) {
+    /**
+     * Obtiene el ID del Estado de Solicitud usando el nombre. 
+     */
+    public int obtenerIdEstadoPorNombre(String estadoNombre) throws SQLException {
+        int idEstado = 0;
+        String sql = "SELECT idestadosolicitud FROM ESTADO_SOLICITUD WHERE LOWER(TRIM(estadosolicitud)) = LOWER(TRIM(?))";
+
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, estadoNombre);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    idEstado = rs.getInt("idestadosolicitud");
+                }
+            }
+        }
+        return idEstado;
+    }
+
+    // ----------------------------------------------------------------------
+    // --- MÉTODO DE ACTUALIZACIÓN (USADO POR EL CONTROLADOR) ---
+    // ----------------------------------------------------------------------
+    /**
+     * Actualiza el estado de la solicitud en la base de datos. Recibe las IDs.
+     */
+    public boolean actualizarEstadoSolicitud(int idSolicitud, int nuevoEstadoId) throws Exception {
+        String sql = "UPDATE SOLICITUD SET IDESTADOSOLICITUD = ? WHERE IDSOLICITUD = ?";
+
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, nuevoEstadoId);
+            pstmt.setInt(2, idSolicitud);
+
+            int filasAfectadas = pstmt.executeUpdate();
+
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error de SQL al actualizar el estado de la solicitud: " + e.getMessage());
+            throw new Exception("Error en la Base de Datos al actualizar solicitud.", e);
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // --- MÉTODOS DE BÚSQUEDA DE DATOS ---
+    // ----------------------------------------------------------------------
+    /**
+     * 1. Obtiene el ID del usuario por nombre completo.
+     */
+    public int obtenerIdUsuarioPorNombre(String nombreCompleto) throws SQLException {
+        String[] partes = nombreCompleto.trim().split(" ", 2);
+        if (partes.length < 2) {
+            return 0;
+        }
+
+        String nombres = partes[0];
+        String apellidos = partes[1];
+        int idUsuario = 0;
+
+        String sql = "SELECT idusuario FROM USUARIO "
+                + "WHERE LOWER(TRIM(nombres)) = LOWER(TRIM(?)) "
+                + "AND LOWER(TRIM(apellidos)) = LOWER(TRIM(?))";
+
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, nombres);
+            pstmt.setString(2, apellidos);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    idUsuario = rs.getInt("idusuario");
+                }
+            }
+        }
+        return idUsuario;
+    }
+
+    /**
+     * 2. Obtener tickets CREADOS por el Cliente.
+     */
+    public List<Solicitud> obtenerSolicitudesPorUsuarioId(int idUsuario) throws SQLException {
         List<Solicitud> solicitudes = new ArrayList<>();
-        final String SQL
-                = "SELECT t.NUMEROTICKET "
+        String sql = "SELECT s.idsolicitud, s.idestadosolicitud, s.idtiposervicio, s.idticket, s.fechacreacion, s.descripcion, "
+                + "t.numeroticket, t.idestadoticket, et.nivelprioridad, ts.nombreservicio, es.estadosolicitud "
                 + "FROM SOLICITUD s "
-                + "INNER JOIN TICKET t ON s.IDTICKET = t.IDTICKET "
-                + "INNER JOIN USUARIO u ON s.IDUSUARIO = u.IDUSUARIO "
-                + "WHERE u.NOMBRES = ? AND u.APELLIDOS = ? "
-                + "ORDER BY t.NUMEROTICKET DESC";
+                + "JOIN TICKET t ON s.idticket = t.idticket "
+                + "JOIN ESTADO_TICKET et ON t.idestadoticket = et.idestadoticket "
+                + "JOIN TIPO_SERVICIO ts ON s.idtiposervicio = ts.idtiposervicio "
+                + "JOIN ESTADO_SOLICITUD es ON s.idestadosolicitud = es.idestadosolicitud "
+                + "WHERE s.idusuario = ?";
 
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(SQL)) {
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            ps.setString(1, usuario.getNombres().trim());
-            ps.setString(2, usuario.getApellidos().trim());
+            pstmt.setInt(1, idUsuario);
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Ticket ticket = new Ticket(null, null, rs.getString("NUMEROTICKET").trim());
-                    Solicitud solicitud = new Solicitud(
-                            usuario, null, null, ticket, null, null
-                    );
-                    solicitudes.add(solicitud);
+                    solicitudes.add(crearObjetoSolicitud(rs));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener solicitudes por usuario: " + e.getMessage());
         }
         return solicitudes;
     }
 
     /**
-     * Mapeo de datos para la vista de seguimiento con correcciones.
+     * 3. Obtener tickets ASIGNADOS a Soporte.
      */
-    public Solicitud obtenerSolicitudPorTicket(String numeroTicket) {
-        Solicitud solicitud = null;
-
-        final String SQL
-                = "SELECT s.FECHACREACION, s.DESCRIPCION, "
-                + "ts.NOMBRESERVICIO, es.ESTADOSOLICITUD, et.NIVELPRIORIDAD "
+    public List<Solicitud> obtenerSolicitudesAsignadasPorId(int idUsuario) throws SQLException {
+        List<Solicitud> solicitudes = new ArrayList<>();
+        String sql = "SELECT s.idsolicitud, s.idestadosolicitud, s.idtiposervicio, s.idticket, s.fechacreacion, s.descripcion, "
+                + "t.numeroticket, t.idestadoticket, et.nivelprioridad, ts.nombreservicio, es.estadosolicitud "
                 + "FROM SOLICITUD s "
-                + "INNER JOIN TICKET t ON s.IDTICKET = t.IDTICKET "
-                + "INNER JOIN TIPO_SERVICIO ts ON s.IDTIPOSERVICIO = ts.IDTIPOSERVICIO "
-                + "INNER JOIN ESTADO_SOLICITUD es ON s.IDESTADOSOLICITUD = es.IDESTADOSOLICITUD "
-                + "INNER JOIN ESTADO_TICKET et ON t.IDESTADOTICKET = et.IDESTADOTICKET "
-                + "WHERE t.NUMEROTICKET = ?";
+                + "JOIN TICKET t ON s.idticket = t.idticket "
+                + "JOIN ESTADO_TICKET et ON t.idestadoticket = et.idestadoticket "
+                + "JOIN TIPO_SERVICIO ts ON s.idtiposervicio = ts.idtiposervicio "
+                + "JOIN ESTADO_SOLICITUD es ON s.idestadosolicitud = es.idestadosolicitud "
+                + "WHERE t.idusuario = ?";
 
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement ps = conn.prepareStatement(SQL)) {
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            ps.setString(1, numeroTicket.trim());
+            pstmt.setInt(1, idUsuario);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-
-                    // 1. Mapeo del TIPO DE SERVICIO (usando NOMBRESERVICIO)
-                    TipoServicio ts = new TipoServicio(rs.getString("NOMBRESERVICIO").trim());
-
-                    // 2. Mapeo del NIVEL DE PRIORIDAD (usando NIVELPRIORIDAD)
-                    EstadoTicket et = new EstadoTicket(rs.getString("NIVELPRIORIDAD").trim());
-
-                    // Se crea el Ticket usando el NIVEL DE PRIORIDAD (EstadoTicket)
-                    Ticket ticket = new Ticket(et, null, numeroTicket.trim());
-
-                    // Mapeo del ESTADO DE LA SOLICITUD
-                    EstadoSolicitud es = new EstadoSolicitud(rs.getString("ESTADOSOLICITUD").trim());
-
-                    // Creación final de la Solicitud
-                    solicitud = new Solicitud(
-                            null, ts, es, ticket,
-                            rs.getDate("FECHACREACION"),
-                            rs.getString("DESCRIPCION").trim()
-                    );
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    solicitudes.add(crearObjetoSolicitud(rs));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener solicitud por ticket: " + e.getMessage());
+        }
+        return solicitudes;
+    }
+
+    /**
+     * 4. Obtener una Solicitud completa por su número de ticket.
+     */
+    public Solicitud obtenerSolicitudPorTicket(String numeroTicket) throws SQLException {
+        Solicitud solicitud = null;
+        String sql = "SELECT s.idsolicitud, s.idestadosolicitud, s.idtiposervicio, s.idticket, s.fechacreacion, s.descripcion, "
+                + "t.numeroticket, t.idestadoticket, et.nivelprioridad, ts.nombreservicio, es.estadosolicitud "
+                + "FROM SOLICITUD s "
+                + "JOIN TICKET t ON s.idticket = t.idticket "
+                + "JOIN ESTADO_TICKET et ON t.idestadoticket = et.idestadoticket "
+                + "JOIN TIPO_SERVICIO ts ON s.idtiposervicio = ts.idtiposervicio "
+                + "JOIN ESTADO_SOLICITUD es ON s.idestadosolicitud = es.idestadosolicitud "
+                + "WHERE LOWER(TRIM(t.numeroticket)) = LOWER(TRIM(?))";
+
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, numeroTicket);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    solicitud = crearObjetoSolicitud(rs);
+                }
+            }
         }
         return solicitud;
     }
 
-    // --------------------------------------------------------------------------------
-    // --- Lógica de Actualización (¡CORRECCIÓN AQUÍ!) ---
-    // --------------------------------------------------------------------------------
-    public void actualizarEstadoSolicitud(String numeroTicket, String nuevoEstadoNombre) throws SQLException {
-        // La consulta se ha reescrito para eliminar cualquier carácter invisible o espacio
-        // innecesario que estaba causando el error de sintaxis en la posición 47.
-        final String SQL_UPDATE
-                = "UPDATE SOLICITUD s SET IDESTADOSOLICITUD = ("
-                + " SELECT IDESTADOSOLICITUD FROM ESTADO_SOLICITUD WHERE TRIM(ESTADOSOLICITUD) = ?"
-                + ") "
-                + "WHERE s.IDTICKET = ("
-                + " SELECT IDTICKET FROM TICKET WHERE TRIM(NUMEROTICKET) = ?"
-                + ")";
+    // ----------------------------------------------------------------------
+    // --- Métodos de Carga Inicial ---
+    // ----------------------------------------------------------------------
+    /**
+     * Obtiene todos los tipos de usuario (cargos).
+     */
+    public List<TipoUsuario> obtenerCargos() throws SQLException {
+        List<TipoUsuario> cargos = new ArrayList<>();
+        String sql = "SELECT cargo FROM TIPO_USUARIO";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
-        try {
-            conn = ConexionBD.conectar();
-
-            // 1. Desactivar Auto-Commit temporalmente (por seguridad)
-            conn.setAutoCommit(false);
-
-            ps = conn.prepareStatement(SQL_UPDATE);
-
-            ps.setString(1, nuevoEstadoNombre.trim());
-            ps.setString(2, numeroTicket.trim());
-
-            int filasAfectadas = ps.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                // 2. FORZAR el COMMIT de la transacción
-                conn.commit();
-                System.out.println("DEBUG DAO: COMMIT exitoso. Filas afectadas: " + filasAfectadas);
-            } else {
-                // Si no se afectó ninguna fila, hacemos un ROLLBACK y lanzamos una excepción
-                conn.rollback();
-                throw new SQLException("La solicitud no pudo ser actualizada. Motivo: El ticket o el estado no son válidos en la base de datos.");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error al actualizar estado de solicitud (DAO): " + e.getMessage());
-
-            // 3. Rollback si falla
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    System.err.println("Error en Rollback: " + ex.getMessage());
-                }
-            }
-            throw e; // Re-lanza la excepción para que el Controller la capture y muestre el mensaje de error.
-
-        } finally {
-            // 4. Asegurar el cierre de recursos
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                // Reestablecer auto-commit antes de cerrar (buena práctica)
-                try {
-                    if (conn != null && !conn.isClosed()) {
-                         conn.setAutoCommit(true);
-                    }
-                } catch (SQLException ex) {
-                    System.err.println("Error al reestablecer auto-commit: " + ex.getMessage());
-                }
-                conn.close();
+            while (rs.next()) {
+                TipoUsuario tu = new TipoUsuario();
+                // Ya no intentamos llamar a tu.setIdTipoUsuario()
+                tu.setCargo(rs.getString("cargo").trim());
+                cargos.add(tu);
             }
         }
+        return cargos;
+    }
+
+    /**
+     * Obtiene todos los usuarios por cargo seleccionado.
+     */
+    public List<Usuario> obtenerUsuariosPorCargo(String cargo) throws SQLException {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT u.nombres, u.apellidos, u.correoelectronico FROM USUARIO u "
+                + "JOIN TIPO_USUARIO tu ON u.idtipousuario = tu.idtipousuario "
+                + "WHERE LOWER(TRIM(tu.cargo)) = LOWER(TRIM(?)) "
+                + "ORDER BY u.apellidos";
+
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, cargo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setNombres(rs.getString("nombres").trim());
+                    u.setApellidos(rs.getString("apellidos").trim());
+                    u.setCorreoElectronico(rs.getString("correoelectronico").trim());
+                    usuarios.add(u);
+                }
+            }
+        }
+        return usuarios;
+    }
+
+    /**
+     * Obtiene todos los estados de solicitud.
+     */
+    public List<EstadoSolicitud> obtenerEstadosSolicitud() throws SQLException {
+        List<EstadoSolicitud> estados = new ArrayList<>();
+        String sql = "SELECT estadosolicitud FROM ESTADO_SOLICITUD";
+
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                EstadoSolicitud es = new EstadoSolicitud();
+                // Ya no intentamos llamar a es.setIdEstadoSolicitud()
+                es.setEstadoSolicitud(rs.getString("estadosolicitud").trim());
+                estados.add(es);
+            }
+        }
+        return estados;
+    }
+
+    // ----------------------------------------------------------------------
+    // --- Mapeo de Entidad ---
+    // ----------------------------------------------------------------------
+    /**
+     * Función utilitaria para crear el objeto Solicitud desde un ResultSet.
+     */
+    private Solicitud crearObjetoSolicitud(ResultSet rs) throws SQLException {
+        Solicitud s = new Solicitud();
+
+        // Mapeo de Solicitud: 
+        s.setFechaCreacion(rs.getDate("fechacreacion"));
+        s.setDescripcion(rs.getString("descripcion").trim());
+
+        // Mapeo de EstadoSolicitud
+        EstadoSolicitud es = new EstadoSolicitud();
+        es.setEstadoSolicitud(rs.getString("estadosolicitud").trim());
+        s.setEstadoSolicitud(es);
+
+        // Mapeo de TipoServicio
+        TipoServicio ts = new TipoServicio();
+        ts.setNombreServicio(rs.getString("nombreservicio").trim());
+        s.setTipoServicio(ts);
+
+        // Mapeo de Ticket
+        Ticket t = new Ticket();
+        t.setNumeroTicket(rs.getString("numeroticket").trim());
+
+        // Mapeo de EstadoTicket
+        EstadoTicket et = new EstadoTicket();
+        et.setNivelPrioridad(rs.getString("nivelprioridad").trim());
+        t.setEstadoTicket(et);
+
+        s.setTicket(t);
+
+        return s;
     }
 }
