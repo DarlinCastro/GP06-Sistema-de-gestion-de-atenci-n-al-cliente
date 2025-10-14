@@ -1,5 +1,15 @@
 package capa_vista;
 
+import capa_controladora.CrearSolicitudController;
+import java.sql.Connection;
+import entidades.TipoServicio;
+import entidades.Usuario;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import base_datos.ConexionBD;
+import java.sql.SQLException;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -10,14 +20,35 @@ package capa_vista;
  * @author erick
  */
 public class jFrameCrearSolicitud extends javax.swing.JFrame {
-
-    /**
-     * Creates new form jFrameCrearSolicitud
-     */
+    
+    // Variables de instancia
+    private Usuario usuario;
+    private int idUsuario;
+    
+    // Constructor usado por NetBeans (para diseño)
     public jFrameCrearSolicitud() {
-        initComponents();
+        initComponents(); 
+        
+        //Para poner la fecha automaticamente
+        String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        txtFechaCreacion.setText(fechaActual);
+        txtFechaCreacion.setEditable(true); 
     }
-
+     public jFrameCrearSolicitud(Usuario usuarioSesion) {
+        // Llama al constructor que tiene initComponents()
+        this(usuarioSesion, -1); 
+    }
+     
+     public jFrameCrearSolicitud(Usuario usuarioSesion, int idUsuario) {
+        initComponents();
+        this.usuario = usuarioSesion; // ✅ INICIALIZACIÓN CORRECTA de la sesión
+        this.idUsuario = idUsuario; 
+        
+        // Inicialización de fecha
+        String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        txtFechaCreacion.setText(fechaActual);
+        txtFechaCreacion.setEditable(false); 
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,6 +67,8 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         txtDescripcion = new javax.swing.JTextArea();
         btnAtras = new javax.swing.JButton();
         btnCrearSolicitud = new javax.swing.JButton();
+        txtTicket = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Crear Solicitud");
@@ -60,6 +93,13 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         });
 
         btnCrearSolicitud.setText("Crear Solicitud");
+        btnCrearSolicitud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCrearSolicitudActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Nº Ticket :");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -68,33 +108,42 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(52, 52, 52)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(btnAtras)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel2)
-                                        .addComponent(jLabel3))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(cbTipoServicio, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane1))))))
+                        .addGap(432, 432, 432)
+                        .addComponent(btnAtras))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(218, 218, 218)
-                        .addComponent(btnCrearSolicitud)))
+                        .addGap(51, 51, 51)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(102, 102, 102)
+                                .addComponent(txtTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel1)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jLabel2)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbTipoServicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addContainerGap(51, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnCrearSolicitud)
+                .addGap(179, 179, 179))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addComponent(btnAtras)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(7, 7, 7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -102,13 +151,13 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(cbTipoServicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(28, 28, 28)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addComponent(btnCrearSolicitud)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addGap(26, 26, 26))
         );
 
         pack();
@@ -121,6 +170,54 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         this.dispose();//Cierra la ventana actual
     }//GEN-LAST:event_btnAtrasActionPerformed
 
+    private void btnCrearSolicitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearSolicitudActionPerformed
+          Connection conn = null;
+    Usuario usuario = capa_controladora.SesionActual.usuarioActual; // 🟢 obtiene el usuario logueado
+
+    if (usuario == null) {
+        JOptionPane.showMessageDialog(this, "Error: No hay sesión activa. Inicie sesión nuevamente.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    try {
+        String email = usuario.getCorreoElectronico().trim(); 
+        String nombreServicio = (String) cbTipoServicio.getSelectedItem();
+        String descripcion = txtDescripcion.getText().trim();
+
+        if (nombreServicio == null || descripcion.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un servicio y añadir una descripción.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        TipoServicio tipoServicio = new TipoServicio();
+        tipoServicio.setNombreServicio(nombreServicio);
+
+        conn = ConexionBD.conectar(); 
+        CrearSolicitudController controller = new CrearSolicitudController(conn);
+
+        String numeroTicketGenerado = controller.crearSolicitudConTicket(usuario, tipoServicio, descripcion);
+
+        if (numeroTicketGenerado != null) {
+            JOptionPane.showMessageDialog(this, "✅ Solicitud creada con éxito.");
+            txtTicket.setText(numeroTicketGenerado); 
+            txtDescripcion.setText("");
+        } else {
+            JOptionPane.showMessageDialog(this, "❌ Error al crear la solicitud. Usuario o servicio no válido.");
+        }
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error inesperado: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+    } finally {
+        if (conn != null) try { conn.close(); } catch (Exception ignored) {}
+    }
+    }//GEN-LAST:event_btnCrearSolicitudActionPerformed
+    
+    public void limpiarCampos() {
+        txtDescripcion.setText("");  // Limpia el campo de descripción
+        cbTipoServicio.setSelectedIndex(0);  // Opcional: Restablece el combo box
+        // No limpies txtTicket ni txtFechaCreacion, ya que son no editables
+    }
     /**
      * @param args the command line arguments
      */
@@ -163,8 +260,10 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea txtDescripcion;
     private javax.swing.JTextField txtFechaCreacion;
+    private javax.swing.JTextField txtTicket;
     // End of variables declaration//GEN-END:variables
 }
