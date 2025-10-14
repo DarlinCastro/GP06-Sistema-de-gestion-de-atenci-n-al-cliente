@@ -11,6 +11,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
+import capa_controladora.SesionActual;
+
 
 /**
  *
@@ -123,6 +125,10 @@ public class jFrameLogin extends javax.swing.JFrame {
 
         // 4. Procesar el resultado del login
         if (cargo != null) {
+            
+            // 2️⃣ Guardamos el usuario completo en SesionActual (UNICAS DOS LINEAS AGREGADAS)
+            capa_controladora.SesionActual.usuarioActual =
+            userController.obtenerUsuarioPorCredenciales(identificador, claveAcceso);//FIN LINEAS AGREGADAS
 
             // Credenciales correctas: Se obtiene el cargo y se elimina cualquier espacio extra.
             String tipoCargo = cargo.getCargo().trim();
