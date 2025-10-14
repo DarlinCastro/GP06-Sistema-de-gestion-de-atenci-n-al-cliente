@@ -50,7 +50,7 @@
                                           <Component id="txtNombres" pref="143" max="32767" attributes="0"/>
                                           <Component id="txtApellidos" max="32767" attributes="0"/>
                                           <Component id="txtId" max="32767" attributes="0"/>
-                                          <Component id="txtContraseña" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="txtContrasena" alignment="0" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <Group type="102" alignment="1" attributes="0">
@@ -119,7 +119,7 @@
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtContraseña" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtContrasena" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -196,7 +196,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="txtId">
     </Component>
-    <Component class="javax.swing.JTextField" name="txtContrase&#xf1;a">
+    <Component class="javax.swing.JTextField" name="txtContrasena">
     </Component>
     <Component class="javax.swing.JButton" name="btnBuscar">
       <Properties>
@@ -279,6 +279,9 @@
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTablaUsuariosMouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

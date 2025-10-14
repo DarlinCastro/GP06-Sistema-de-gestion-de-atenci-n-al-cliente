@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class ConexionBD {
     private static final String URL ="jdbc:postgresql://localhost:5432/proyecto_prnIII";
     private static final String USER="postgres";
-    private static final String PASSWORD="Admin";
+    private static final String PASSWORD="postgres";
     //
     public static Connection conectar(){
         Connection conn=null;

@@ -1,6 +1,12 @@
 package capa_vista;
 
 
+import base_datos.UsuarioDAO;
+import capa_controladora.GestionarController;
+import entidades.Password;
+import entidades.TipoUsuario;
+import entidades.Usuario;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -14,14 +20,44 @@ import javax.swing.table.DefaultTableModel;
  * @author erick
  */
 public class jFrameGestionarUsuarios extends javax.swing.JFrame {
-
+    private GestionarController controller; // ✅ Declarar controlador
     /**
      * Creates new form jFrameGestionarUsuarios
      */
     public jFrameGestionarUsuarios() {
         initComponents();
+        controller = new GestionarController();
+        actualizarTabla();
     }
-
+    
+   
+    private void actualizarTabla() {
+    List<Usuario> usuarios = controller.obtenerUsuarios();  // Obtiene la lista actualizada del Controller
+    DefaultTableModel model = (DefaultTableModel)jTablaUsuarios.getModel();  // Asume que tu tabla se llama jTableUsuarios
+    model.setRowCount(0);  // Limpia las filas existentes para evitar duplicados
+    
+    for (Usuario u : usuarios) {
+        Object[] row = {
+            u.getNombres(),
+            u.getApellidos(),
+            u.getCorreoElectronico(),
+            u.getTipoUsuario().getCargo(),  // O el campo que muestres
+            u.getPassword().getIdentificador(),// Para el identificador
+            u.getPassword().getClaveAcceso()
+                
+        };
+        model.addRow(row);  // Agrega cada fila
+    }
+    }
+   
+     private void limpiarCampos() {
+        txtNombres.setText("");
+        txtApellidos.setText("");
+        txtCorreo.setText("");
+        txtId.setText("");
+        txtContrasena.setText("");
+        cbCargos.setSelectedIndex(0);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -43,7 +79,7 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
         txtApellidos = new javax.swing.JTextField();
         txtCorreo = new javax.swing.JTextField();
         txtId = new javax.swing.JTextField();
-        txtContraseña = new javax.swing.JTextField();
+        txtContrasena = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
@@ -105,6 +141,11 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
                 "Nombres", "Apellidos", "Correo Electrónico", "Cargo", "Identificador", "Contraseña"
             }
         ));
+        jTablaUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTablaUsuariosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTablaUsuarios);
 
         btnAtras.setText("Atrás");
@@ -142,7 +183,7 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
                                             .addComponent(txtNombres, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
                                             .addComponent(txtApellidos)
                                             .addComponent(txtId)
-                                            .addComponent(txtContraseña)))
+                                            .addComponent(txtContrasena)))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
                                         .addComponent(cbCargos, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))))
@@ -193,7 +234,7 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
                         .addGap(15, 15, 15)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtContrasena, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(35, 35, 35)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnRegistrar)
@@ -205,53 +246,99 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        // Obtenemos el modelo de la tabla
-                DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
-                
-                // Creamos una fila con los datos del formulario
-                Object[] columna = {
-                    txtNombres.getText(),
-                    txtApellidos.getText(),
-                    txtCorreo.getText(),            
-                    cbCargos.getSelectedItem(),
-                    txtId.getText(),
-                    txtContraseña.getText()
-                };
-                modelo.addRow(columna);
-
-                // Limpiamos campos después de asignar
-                txtNombres.setText("");               
-                txtApellidos.setText("");
-                txtCorreo.setText("");
-                txtId.setText("");
-                txtContraseña.setText("");
+         try {
+        String nombres = txtNombres.getText();
+        String apellidos = txtApellidos.getText();
+        String correo = txtCorreo.getText();
+        String claveAcceso = txtContrasena.getText();
+        String identificador = txtId.getText();
+        String cargo = (String) cbCargos.getSelectedItem();  // Actualizado para JComboBox
+        
+        if (cargo == null) {  // Verifica si se seleccionó algo
+            JOptionPane.showMessageDialog(null, "Selecciona un cargo");
+            return;
+        }
+        
+        Password password = new Password(claveAcceso, identificador);
+        TipoUsuario tipoUsuario = new TipoUsuario(cargo);  // Pasa el cargo al constructor
+        Usuario nuevoUsuario = new Usuario(nombres, apellidos, correo, tipoUsuario, password);
+        
+        controller.agregarUsuario(nuevoUsuario);
+        JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
+        actualizarTabla();
+        limpiarCampos();
+        
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al registrar: " + ex.getMessage());
+        }
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        
+          int selectedRow = jTablaUsuarios.getSelectedRow();
+
+    if (selectedRow != -1) {
+        try {
+            // 1️⃣ Obtener datos desde los campos del formulario
+            String nombres = txtNombres.getText().trim();
+            String apellidos = txtApellidos.getText().trim();
+            String correo = txtCorreo.getText().trim();
+            String claveAcceso = txtContrasena.getText().trim();
+            String identificador = txtId.getText().trim(); // ✅ Usamos el campo, no la tabla
+            String cargo = cbCargos.getSelectedItem().toString();
+
+            // 2️⃣ Validar campos
+            if (nombres.isEmpty() || apellidos.isEmpty() || correo.isEmpty() || claveAcceso.isEmpty() || identificador.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "⚠️ Todos los campos deben estar completos.");
+                return;
+            }
+
+            // 3️⃣ Construir el objeto Usuario
+            Password password = new Password(claveAcceso, identificador);
+            TipoUsuario tipoUsuario = new TipoUsuario(cargo);
+            Usuario usuarioActualizado = new Usuario(nombres, apellidos, correo, tipoUsuario, password);
+
+            // 4️⃣ Actualizar vía controlador
+            controller.actualizarUsuario(usuarioActualizado);
+
+            // 5️⃣ Confirmación y limpieza
+            JOptionPane.showMessageDialog(null, "✅ Usuario actualizado exitosamente");
+            actualizarTabla();
+            limpiarCampos();
+            jTablaUsuarios.clearSelection(); // 🔄 Deselecciona la fila
+            txtId.setEditable(true);         // 🔓 Reactiva el campo si lo habías bloqueado
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "❌ Error al actualizar: " + ex.getMessage());
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "⚠️ Selecciona un usuario desde la tabla para actualizar.");
+    }
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-                // Obtenemos el modelo de la tabla
-                DefaultTableModel modelo = (DefaultTableModel) jTablaUsuarios.getModel();
-                
-                //Detectar fila seleccionada
-                int filaSeleccionada =jTablaUsuarios.getSelectedRow();
-                
-                //Eliminar fila del modelo con confirmación
-                if (filaSeleccionada != -1) {
-                     // Mostrar cuadro de confirmación
-                int confirmacion = JOptionPane.showConfirmDialog(null,"¿Estás seguro de que deseas eliminar este usuario?","Confirmar eliminación",JOptionPane.YES_NO_OPTION);
-                
-                if (confirmacion == JOptionPane.YES_OPTION) {
-                     modelo.removeRow(filaSeleccionada);
-                     JOptionPane.showMessageDialog(null, "Usuario eliminado correctamente.");
+     int selectedRow = jTablaUsuarios.getSelectedRow();  // Obtiene la fila seleccionada
+            if (selectedRow != -1) {  // Verifica si hay una fila seleccionada
+             int confirmacion = JOptionPane.showConfirmDialog(null, 
+            "¿Estás seguro de que quieres eliminar este usuario?", 
+            "Confirmar eliminación", 
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {  // Solo si el usuario dice Sí
+            try {
+                String identificador = (String) jTablaUsuarios.getValueAt(selectedRow, 4);  // Asume columna 4 es el identificador
+                controller.eliminarUsuario(identificador);  // Llama al Controller
+                JOptionPane.showMessageDialog(null, "Usuario eliminado exitosamente");
+                actualizarTabla();  // Actualiza la tabla
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error al eliminar: " + ex.getMessage());
+            }
+        }  // Si dice No, no se hace nada
+        
+    } else {
+        JOptionPane.showMessageDialog(null, "Selecciona un usuario para eliminar");
         }
-                } else {
-                JOptionPane.showMessageDialog(null, "Selecciona un usuario para eliminar.");
-}    
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
@@ -283,6 +370,27 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
         atras.setLocationRelativeTo(null);
         this.dispose();//Cierra la ventana actual
     }//GEN-LAST:event_btnAtrasActionPerformed
+
+    private void jTablaUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTablaUsuariosMouseClicked
+         int selectedRow = jTablaUsuarios.getSelectedRow();
+    if (selectedRow != -1) {
+        // Obtener datos de la fila seleccionada
+        String nombres = (String) jTablaUsuarios.getValueAt(selectedRow, 0);
+        String apellidos = (String) jTablaUsuarios.getValueAt(selectedRow, 1);
+        String correo = (String) jTablaUsuarios.getValueAt(selectedRow, 2);
+        String cargo = (String) jTablaUsuarios.getValueAt(selectedRow, 3);
+        String identificador = (String) jTablaUsuarios.getValueAt(selectedRow, 4);
+        String clave = (String) jTablaUsuarios.getValueAt(selectedRow, 5);
+
+        // Llenar los campos del formulario
+        txtNombres.setText(nombres);
+        txtApellidos.setText(apellidos);
+        txtCorreo.setText(correo);
+        cbCargos.setSelectedItem(cargo);
+        txtId.setText(identificador);
+        txtContrasena.setText(clave); 
+        }
+    }//GEN-LAST:event_jTablaUsuariosMouseClicked
 
     /**
      * @param args the command line arguments
@@ -336,7 +444,7 @@ public class jFrameGestionarUsuarios extends javax.swing.JFrame {
     private javax.swing.JTable jTablaUsuarios;
     private javax.swing.JTextField txtApellidos;
     private javax.swing.JTextField txtBuscar;
-    private javax.swing.JTextField txtContraseña;
+    private javax.swing.JTextField txtContrasena;
     private javax.swing.JTextField txtCorreo;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombres;
