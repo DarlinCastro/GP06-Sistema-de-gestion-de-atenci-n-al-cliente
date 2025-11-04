@@ -1,6 +1,6 @@
 package capa_vista;
 
-import capa_controladora.SolicitudController;
+import capa_controladora.SeguimientoSolicitudController;
 import capa_vista.jFrameSeguimientoSolicitud; // Asumiendo que esta es la ruta de tu vista
 
 /*
@@ -19,6 +19,7 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
      */
     public jFrameMenuTecnico() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -28,22 +29,38 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanelMenuProgramador = new javax.swing.JPanel();
+        lblMenuTecYPro = new javax.swing.JLabel();
         btnSeguimiento = new javax.swing.JButton();
         btnGenerarReportes = new javax.swing.JButton();
         btnAtras = new javax.swing.JButton();
-        lblMenuTecYPro = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        btnSeguimiento.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnSeguimiento.setText("Seguimiento de Solicitud");
+        jPanelMenuProgramador.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelMenuProgramador.setPreferredSize(new java.awt.Dimension(640, 300));
+
+        lblMenuTecYPro.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblMenuTecYPro.setText("Menu Tecnico y Programador");
+
+        btnSeguimiento.setBackground(new java.awt.Color(51, 51, 255));
+        btnSeguimiento.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnSeguimiento.setForeground(new java.awt.Color(255, 255, 255));
+        btnSeguimiento.setText("Seguimiento Solicitud");
         btnSeguimiento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSeguimientoActionPerformed(evt);
             }
         });
 
-        btnGenerarReportes.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnGenerarReportes.setBackground(new java.awt.Color(51, 51, 255));
+        btnGenerarReportes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnGenerarReportes.setForeground(new java.awt.Color(255, 255, 255));
         btnGenerarReportes.setText("Generar Reportes");
         btnGenerarReportes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -51,7 +68,9 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
             }
         });
 
-        btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnAtras.setBackground(new java.awt.Color(51, 51, 255));
+        btnAtras.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnAtras.setForeground(new java.awt.Color(255, 255, 255));
         btnAtras.setText("Atras");
         btnAtras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -59,44 +78,106 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
             }
         });
 
-        lblMenuTecYPro.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        lblMenuTecYPro.setText("Menu Tecnico y Programador");
+        jLabel1.setBackground(new java.awt.Color(255, 51, 51));
+        jLabel1.setForeground(new java.awt.Color(102, 102, 255));
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/imagenLogo/KIA_LOGO.jpg"))); // NOI18N
+
+        jPanel1.setBackground(new java.awt.Color(0, 51, 153));
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("© 2025 KIA. Todos los derechos reservados");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(196, 196, 196)
+                .addComponent(jLabel2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 6, Short.MAX_VALUE)
+                .addComponent(jLabel2))
+        );
+
+        jPanel2.setBackground(new java.awt.Color(0, 51, 153));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 17, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanelMenuProgramadorLayout = new javax.swing.GroupLayout(jPanelMenuProgramador);
+        jPanelMenuProgramador.setLayout(jPanelMenuProgramadorLayout);
+        jPanelMenuProgramadorLayout.setHorizontalGroup(
+            jPanelMenuProgramadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnAtras)
+                .addContainerGap())
+            .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel3)
+                .addGroup(jPanelMenuProgramadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanelMenuProgramadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSeguimiento))
+                        .addGap(107, 107, 107))
+                    .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                        .addGap(48, 48, 48)
+                        .addComponent(lblMenuTecYPro)
+                        .addContainerGap(48, Short.MAX_VALUE))))
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanelMenuProgramadorLayout.setVerticalGroup(
+            jPanelMenuProgramadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanelMenuProgramadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuProgramadorLayout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(btnAtras)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelMenuProgramadorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelMenuProgramadorLayout.createSequentialGroup()
+                        .addComponent(lblMenuTecYPro)
+                        .addGap(37, 37, 37)
+                        .addComponent(btnGenerarReportes)
+                        .addGap(31, 31, 31)
+                        .addComponent(btnSeguimiento))
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addComponent(btnSeguimiento)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
-                .addComponent(btnGenerarReportes)
-                .addGap(80, 80, 80))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnAtras)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(142, 142, 142)
-                .addComponent(lblMenuTecYPro)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanelMenuProgramador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(btnAtras)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
-                        .addComponent(lblMenuTecYPro)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnGenerarReportes)
-                            .addComponent(btnSeguimiento))
-                        .addGap(92, 92, 92))))
+            .addComponent(jPanelMenuProgramador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -106,7 +187,7 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
         // 1. Crea la interfaz visual (la Vista)
         jFrameSeguimientoSolicitud vSeguimiento = new jFrameSeguimientoSolicitud();
         // 2. Crea el Controlador, pasándole la Vista
-        SolicitudController controlador = new SolicitudController(vSeguimiento, this);
+        SeguimientoSolicitudController controlador = new SeguimientoSolicitudController(vSeguimiento, this);
         // 3. Le pedimos al Controller que inicie la Vista y la lógica
         controlador.iniciar();
         // 4. Cierra la ventana actual
@@ -166,6 +247,12 @@ public class jFrameMenuTecnico extends javax.swing.JFrame {
     private javax.swing.JButton btnAtras;
     private javax.swing.JButton btnGenerarReportes;
     private javax.swing.JButton btnSeguimiento;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanelMenuProgramador;
     private javax.swing.JLabel lblMenuTecYPro;
     // End of variables declaration//GEN-END:variables
 }

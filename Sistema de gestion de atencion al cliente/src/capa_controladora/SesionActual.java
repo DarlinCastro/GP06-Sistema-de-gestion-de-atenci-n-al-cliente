@@ -4,7 +4,7 @@
  */
 package capa_controladora;
 
-import entidades.Usuario;
+import capa_modelo.Usuario;
 
 /**
  *

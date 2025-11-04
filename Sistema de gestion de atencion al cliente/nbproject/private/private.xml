@@ -1,30 +1,9 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_vista/jFrameSeguimientoSolicitud.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_controladora/SolicitudController.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/base_datos/SolicitudDAO.java</file>
-            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/base_datos/ConexionBD.java</file>
+            <file>file:/C:/Users/RYZEN/OneDrive/Documentos/Proyecto_PRN315_Java/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_vista/jFrameCrearCuenta.java</file>
         </group>
     </open-files>
 </project-private>
-=======
-<?xml version="1.0" encoding="UTF-8"?>
-<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/TipoUsuario.java</file>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/Password.java</file>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_controladora/UsuarioController.java</file>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_vista/jFrameLogin.java</file>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/capa_vista/jFrameCrearCuenta.java</file>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/entidades/Usuario.java</file>
-            <file>file:/C:/Users/Adam/Documents/NetBeansProjects/GP06-Sistema-de-gestion-de-atenci-n-al-cliente/Sistema%20de%20gestion%20de%20atencion%20al%20cliente/src/base_datos/ConexionBD.java</file>
-        </group>
-    </open-files>
-</project-private>
->>>>>>> origin/main

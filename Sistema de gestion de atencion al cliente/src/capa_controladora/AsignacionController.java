@@ -4,7 +4,13 @@
  */
 package capa_controladora;
 
-import entidades.*; 
+import capa_modelo.EstadoSolicitud; 
+import capa_modelo.Usuario;
+import capa_modelo.Ticket;
+import capa_modelo.TipoUsuario;
+import capa_modelo.EstadoTicket;
+import capa_modelo.TipoServicio;
+import capa_modelo.Solicitud;
 import base_datos.ConexionBD; 
 import capa_vista.jFrameAsignarSolicitud; 
 

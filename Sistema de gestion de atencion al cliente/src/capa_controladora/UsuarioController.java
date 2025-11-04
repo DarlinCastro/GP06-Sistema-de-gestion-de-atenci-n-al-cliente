@@ -6,9 +6,9 @@ package capa_controladora;
  */
 import base_datos.ConexionBD;
 import capa_vista.jFrameLogin;
-import entidades.Usuario;
-import entidades.TipoUsuario;
-import entidades.Password;
+import capa_modelo.Usuario;
+import capa_modelo.TipoUsuario;
+import capa_modelo.Password;
 
 import javax.swing.*;
 import java.sql.Connection;

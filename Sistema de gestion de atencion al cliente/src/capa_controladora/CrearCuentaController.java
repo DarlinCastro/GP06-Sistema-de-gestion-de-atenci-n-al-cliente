@@ -5,7 +5,7 @@
 package capa_controladora;
 
 import base_datos.ConexionBD;
-import entidades.Usuario;
+import capa_modelo.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  *
  * @author Adam
  */
-public class CuentaController {
+public class CrearCuentaController {
 
     public boolean registrarUsuario(Usuario usuario, String contraseña, String identificador) {
         Connection con = null;

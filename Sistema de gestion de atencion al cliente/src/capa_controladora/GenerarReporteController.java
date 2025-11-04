@@ -1,7 +1,7 @@
 package capa_controladora;
 
 import base_datos.ConexionBD;
-import entidades.TipoServicio;
+import capa_modelo.TipoServicio;
 import java.awt.Component; 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +17,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.text.SimpleDateFormat;
 
-public class ReporteController {
+public class GenerarReporteController {
     
     // CLASE ESTRUCTURAL DE DATOS (DTO)
     public static class ReporteData {

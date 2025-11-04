@@ -1,32 +1,40 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package base_datos;
+package capa_controladora;
 
-import entidades.Usuario;
-import entidades.TipoUsuario;
-import entidades.Password;
+import capa_modelo.Usuario;
+import capa_modelo.TipoUsuario;
+import capa_modelo.Password;
+import base_datos.ConexionBD;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-/**
- *
- * @author erick
- */
-public class UsuarioDAO {
 
-     // --- INSERTAR USUARIO ---
+/**
+ * Clase que actúa como Controlador y DAO unificado para la gestión de usuarios.
+ * Contiene la lógica CRUD (Crear, Leer, Actualizar, Eliminar) para Usuario.
+ */
+public class GestionarUsuariosController {
+
+    // Constructor simple
+    public GestionarUsuariosController() {
+    }
+
+    // ===================================================
+    // 💾 MÉTODO: AGREGAR USUARIO (CREATE)
+    // ===================================================
+    /**
+     * Agrega un nuevo usuario a la base de datos, manejando la transacción.
+     * @param u Objeto Usuario con los datos a registrar.
+     */
     public void agregarUsuario(Usuario u) {
         Connection con = null;
         PreparedStatement psPass = null;
         PreparedStatement psUsuario = null;
 
         try {
-            con = ConexionBD.conectar();
-            con.setAutoCommit(false); // 🔒 Transacción
+            con = ConexionBD.conectar(); 
+            con.setAutoCommit(false); // Inicia Transacción
 
             // 1️⃣ Insertar en pasword
             String sqlPass = "INSERT INTO pasword (claveacceso, identificador) VALUES (?, ?) RETURNING idpasword";
@@ -40,7 +48,7 @@ public class UsuarioDAO {
                 idPasword = rsPass.getInt("idpasword");
             }
 
-            // 2️⃣ Obtener idtipousuario desde cargo
+            // 2️⃣ Obtener idtipousuario por cargo
             String sqlTipo = "SELECT idtipousuario FROM tipo_usuario WHERE cargo = ?";
             PreparedStatement psTipo = con.prepareStatement(sqlTipo);
             psTipo.setString(1, u.getTipoUsuario().getCargo());
@@ -65,12 +73,12 @@ public class UsuarioDAO {
             psUsuario.setInt(5, idPasword);
 
             psUsuario.executeUpdate();
-            con.commit(); // ✅ Confirmamos
+            con.commit(); // Confirma Transacción
 
         } catch (SQLException e) {
             System.out.println("❌ Error al agregar usuario: " + e.getMessage());
             try {
-                if (con != null) con.rollback();
+                if (con != null) con.rollback(); // Revierte en caso de error
             } catch (SQLException ex) {
                 System.out.println("⚠️ Error al hacer rollback: " + ex.getMessage());
             }
@@ -86,7 +94,13 @@ public class UsuarioDAO {
         }
     }
 
-    // --- LISTAR USUARIOS ---
+    // ===================================================
+    // 📖 MÉTODO: OBTENER USUARIOS (READ)
+    // ===================================================
+    /**
+     * Obtiene la lista de todos los usuarios registrados.
+     * @return Lista de usuarios desde la base de datos.
+     */
     public List<Usuario> obtenerUsuarios() {
         List<Usuario> lista = new ArrayList<>();
         String sql = """
@@ -127,32 +141,18 @@ public class UsuarioDAO {
         return lista;
     }
 
-    // --- ELIMINAR USUARIO ---
-    public void eliminarUsuario(String identificador) {
-        String sql = """
-            DELETE FROM usuario 
-                    WHERE idpasword IN (
-                        SELECT idpasword FROM pasword WHERE identificador = ?
-                    )
-            """;
-
-        try (Connection con = ConexionBD.conectar();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, identificador);
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            System.out.println("❌ Error al eliminar usuario: " + e.getMessage());
-        }
-    }
-
-    // --- ACTUALIZAR USUARIO ---
+    // ===================================================
+    // ✏️ MÉTODO: ACTUALIZAR USUARIO (UPDATE)
+    // ===================================================
+    /**
+     * Actualiza un usuario existente en la base de datos, manejando la transacción.
+     * @param u Objeto Usuario con los datos actualizados.
+     */
     public void actualizarUsuario(Usuario u) {
         Connection con = null;
         try {
             con = ConexionBD.conectar();
-            con.setAutoCommit(false);
+            con.setAutoCommit(false); // Inicia Transacción
 
             // 1️⃣ Actualizar pasword
             String sqlPass = "UPDATE pasword SET claveacceso=? WHERE identificador=?";
@@ -175,11 +175,11 @@ public class UsuarioDAO {
 
             // 3️⃣ Actualizar usuario
             String sqlUsuario = """
-               UPDATE usuario 
-                    SET nombres=?, apellidos=?, correoelectronico=?, idtipousuario=?
-                    WHERE idpasword IN (
-                        SELECT idpasword FROM pasword WHERE identificador = ?
-                    )
+                UPDATE usuario 
+                     SET nombres=?, apellidos=?, correoelectronico=?, idtipousuario=?
+                     WHERE idpasword IN (
+                         SELECT idpasword FROM pasword WHERE identificador = ?
+                     )
                 """;
             PreparedStatement psUsuario = con.prepareStatement(sqlUsuario);
             psUsuario.setString(1, u.getNombres());
@@ -189,17 +189,71 @@ public class UsuarioDAO {
             psUsuario.setString(5, u.getPassword().getIdentificador());
             psUsuario.executeUpdate();
 
-            con.commit();
+            con.commit(); // Confirma Transacción
 
         } catch (SQLException e) {
             System.out.println("❌ Error al actualizar usuario: " + e.getMessage());
             try {
-                if (con != null) con.rollback();
+                if (con != null) con.rollback(); // Revierte en caso de error
             } catch (SQLException ex) {
                 System.out.println("⚠️ Error al hacer rollback: " + ex.getMessage());
             }
         } finally {
             try {
+                if (con != null) con.setAutoCommit(true);
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                System.out.println("⚠️ Error al cerrar conexión: " + e.getMessage());
+            }
+        }
+    }
+
+    // ===================================================
+    // 🗑️ MÉTODO: ELIMINAR USUARIO (DELETE)
+    // ===================================================
+    /**
+     * Elimina un usuario de las tablas 'usuario' y 'pasword' según su identificador único.
+     * @param identificador Identificador del usuario a eliminar.
+     */
+    public void eliminarUsuario(String identificador) {
+        
+        String sqlDeleteUsuario = """
+            DELETE FROM usuario 
+                    WHERE idpasword IN (
+                        SELECT idpasword FROM pasword WHERE identificador = ?
+                    )
+            """;
+        
+        String sqlDeletePassword = "DELETE FROM pasword WHERE identificador = ?";
+
+        Connection con = null;
+        try {
+            con = ConexionBD.conectar();
+            con.setAutoCommit(false); // Inicia Transacción
+
+            // 1️⃣ Eliminar de la tabla usuario
+            try (PreparedStatement psUsuario = con.prepareStatement(sqlDeleteUsuario)) {
+                psUsuario.setString(1, identificador);
+                psUsuario.executeUpdate();
+            }
+
+            // 2️⃣ Eliminar de la tabla pasword
+             try (PreparedStatement psPass = con.prepareStatement(sqlDeletePassword)) {
+                psPass.setString(1, identificador);
+                psPass.executeUpdate();
+            }
+            
+            con.commit(); // Confirma Transacción
+
+        } catch (SQLException e) {
+            System.out.println("❌ Error al eliminar usuario: " + e.getMessage());
+            try {
+                if (con != null) con.rollback(); // Revierte en caso de error
+            } catch (SQLException ex) {
+                System.out.println("⚠️ Error al hacer rollback: " + ex.getMessage());
+            }
+        } finally {
+             try {
                 if (con != null) con.setAutoCommit(true);
                 if (con != null) con.close();
             } catch (SQLException e) {

@@ -15,6 +15,7 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
      */
     public jFrameMenuAdmin() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -24,42 +25,25 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnGestionarUsuarios = new javax.swing.JButton();
-        btnAsignarSolicitudes = new javax.swing.JButton();
-        lblMenuAdministrador = new javax.swing.JLabel();
-        btnGenerarReportes = new javax.swing.JButton();
+        jPanelMenuAdministrador = new javax.swing.JPanel();
         btnAtras = new javax.swing.JButton();
+        lblMenuAdministrador = new javax.swing.JLabel();
+        btnAsignarSolicitudes = new javax.swing.JButton();
+        btnGestionarUsuarios = new javax.swing.JButton();
+        btnGenerarReportes = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        btnGestionarUsuarios.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnGestionarUsuarios.setText("Gestionar Usuarios");
-        btnGestionarUsuarios.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGestionarUsuariosActionPerformed(evt);
-            }
-        });
+        jPanelMenuAdministrador.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelMenuAdministrador.setPreferredSize(new java.awt.Dimension(640, 300));
 
-        btnAsignarSolicitudes.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnAsignarSolicitudes.setText("Asignar Solicitudes");
-        btnAsignarSolicitudes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAsignarSolicitudesActionPerformed(evt);
-            }
-        });
-
-        lblMenuAdministrador.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        lblMenuAdministrador.setText("Menu Administrador");
-
-        btnGenerarReportes.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnGenerarReportes.setText("Generar Reportes");
-        btnGenerarReportes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGenerarReportesActionPerformed(evt);
-            }
-        });
-
-        btnAtras.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnAtras.setBackground(new java.awt.Color(0, 102, 204));
+        btnAtras.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnAtras.setForeground(new java.awt.Color(255, 255, 255));
         btnAtras.setText("Atras");
         btnAtras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -67,40 +51,137 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
             }
         });
 
+        lblMenuAdministrador.setBackground(new java.awt.Color(255, 255, 255));
+        lblMenuAdministrador.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblMenuAdministrador.setText("Menu Administrador");
+
+        btnAsignarSolicitudes.setBackground(new java.awt.Color(0, 102, 204));
+        btnAsignarSolicitudes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnAsignarSolicitudes.setForeground(new java.awt.Color(255, 255, 255));
+        btnAsignarSolicitudes.setText("Asignar Solicitudes");
+        btnAsignarSolicitudes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAsignarSolicitudesActionPerformed(evt);
+            }
+        });
+
+        btnGestionarUsuarios.setBackground(new java.awt.Color(0, 102, 204));
+        btnGestionarUsuarios.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnGestionarUsuarios.setForeground(new java.awt.Color(255, 255, 255));
+        btnGestionarUsuarios.setText("Gestionar Usuarios");
+        btnGestionarUsuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGestionarUsuariosActionPerformed(evt);
+            }
+        });
+
+        btnGenerarReportes.setBackground(new java.awt.Color(0, 102, 204));
+        btnGenerarReportes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnGenerarReportes.setForeground(new java.awt.Color(255, 255, 255));
+        btnGenerarReportes.setText("Generar Reportes");
+        btnGenerarReportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarReportesActionPerformed(evt);
+            }
+        });
+
+        jPanel2.setBackground(new java.awt.Color(0, 51, 153));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 17, Short.MAX_VALUE)
+        );
+
+        jPanel1.setBackground(new java.awt.Color(0, 51, 153));
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("© 2025 KIA. Todos los derechos reservados");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(195, 195, 195)
+                .addComponent(jLabel2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 6, Short.MAX_VALUE)
+                .addComponent(jLabel2))
+        );
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/imagenLogo/KIA_LOGO.jpg"))); // NOI18N
+
+        javax.swing.GroupLayout jPanelMenuAdministradorLayout = new javax.swing.GroupLayout(jPanelMenuAdministrador);
+        jPanelMenuAdministrador.setLayout(jPanelMenuAdministradorLayout);
+        jPanelMenuAdministradorLayout.setHorizontalGroup(
+            jPanelMenuAdministradorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jLabel1)
+                .addGroup(jPanelMenuAdministradorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                        .addGap(89, 89, 89)
+                        .addGroup(jPanelMenuAdministradorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnGestionarUsuarios)
+                            .addComponent(btnAsignarSolicitudes)))
+                    .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                        .addGap(56, 56, 56)
+                        .addComponent(lblMenuAdministrador)
+                        .addGap(54, 54, 54)
+                        .addComponent(btnAtras)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelMenuAdministradorLayout.setVerticalGroup(
+            jPanelMenuAdministradorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanelMenuAdministradorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                        .addGroup(jPanelMenuAdministradorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                                .addComponent(lblMenuAdministrador)
+                                .addGap(29, 29, 29))
+                            .addGroup(jPanelMenuAdministradorLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnAtras)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(btnGestionarUsuarios)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnGenerarReportes)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnAsignarSolicitudes)
+                        .addGap(17, 17, 17)))
+                .addGap(27, 27, 27)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnAtras)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnGestionarUsuarios)
-                        .addGap(44, 44, 44)
-                        .addComponent(btnAsignarSolicitudes)
-                        .addGap(32, 32, 32)
-                        .addComponent(btnGenerarReportes)
-                        .addGap(13, 13, 13)))
-                .addContainerGap(34, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblMenuAdministrador)
-                .addGap(229, 229, 229))
+            .addComponent(jPanelMenuAdministrador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(btnAtras)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblMenuAdministrador)
-                .addGap(99, 99, 99)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAsignarSolicitudes)
-                    .addComponent(btnGestionarUsuarios)
-                    .addComponent(btnGenerarReportes))
-                .addContainerGap(175, Short.MAX_VALUE))
+            .addComponent(jPanelMenuAdministrador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -174,6 +255,11 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
     private javax.swing.JButton btnAtras;
     private javax.swing.JButton btnGenerarReportes;
     private javax.swing.JButton btnGestionarUsuarios;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanelMenuAdministrador;
     private javax.swing.JLabel lblMenuAdministrador;
     // End of variables declaration//GEN-END:variables
 }
