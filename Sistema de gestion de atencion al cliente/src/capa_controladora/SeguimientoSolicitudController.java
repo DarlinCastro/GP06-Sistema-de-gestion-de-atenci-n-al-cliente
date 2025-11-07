@@ -3,10 +3,9 @@ package capa_controladora;
 import capa_modelo.EstadoSolicitud;
 import capa_modelo.Usuario;
 import capa_modelo.Ticket;
-import capa_modelo.TipoUsuario;
-import capa_modelo.EstadoTicket;
 import capa_modelo.TipoServicio;
 import capa_modelo.Solicitud;
+import capa_modelo.EstadoTicket; 
 import capa_vista.jFrameSeguimientoSolicitud;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,13 +19,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Date; 
-import base_datos.ConexionBD; 
+import base_datos.ConexionBD;
+
 
 public class SeguimientoSolicitudController implements ActionListener {
 
     private final jFrameSeguimientoSolicitud vista;
-    private final JFrame ventanaOrigen; 
+    private final JFrame ventanaOrigen;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     private Solicitud solicitudActual;
@@ -35,20 +34,31 @@ public class SeguimientoSolicitudController implements ActionListener {
     private static final String ESTADO_CANCELADO_NOMBRE = "Cancelado";
     private static final String SELECCIONE_ITEM = "Seleccione ";
 
+    // CONSTRUCTOR
     public SeguimientoSolicitudController(jFrameSeguimientoSolicitud vista, JFrame ventanaOrigen) {
         this.vista = vista;
-        this.ventanaOrigen = ventanaOrigen; 
+        this.ventanaOrigen = ventanaOrigen;
+        
+        // **Validación de Sesión**
+        if (SesionActual.usuarioActual == null) {
+            JOptionPane.showMessageDialog(vista, "Error: No hay usuario logeado en la sesión.", "Error Grave", JOptionPane.ERROR_MESSAGE);
+            vista.dispose();
+            return;
+        }
+
         this.vista.setControlador(this);
         inicializarComponentes();
         cargarDatosIniciales();
+        adaptarVistaSegunRol(); 
     }
 
     private void inicializarComponentes() {
+        // Agregar Listeners
         vista.getCbCargo().addActionListener(this);
         vista.getCbNombre().addActionListener(this);
-        vista.getCbNTicket().addActionListener(this);
+        vista.getCbNTicket().addActionListener(this); 
         vista.getBtnActualizarSolicitud().addActionListener(this);
-        // Botón Cancelar tiene su propio ActionPerformed en la vista, que llama a cancelarSolicitudDesdeVista()
+        vista.getBtnCancelarSolicitud().addActionListener(this);
 
         // Bloquear campos de solo lectura
         vista.getTxtFechaCreacion().setEditable(false);
@@ -57,140 +67,115 @@ public class SeguimientoSolicitudController implements ActionListener {
         vista.getTxtNivelPrioridad().setEditable(false);
     }
     
-    private void resetearCombosSecundarios() {
-        // Reinicia Nombre
+    // MÉTODO CORREGIDO para carga directa de tickets según el rol
+    private void adaptarVistaSegunRol() {
+        Usuario usuarioLogeado = SesionActual.usuarioActual;
+        
+        if (usuarioLogeado == null || usuarioLogeado.getTipoUsuario() == null) return;
+        
+        String cargo = usuarioLogeado.getTipoUsuario().getCargo().trim();
+        String nombreCompleto = usuarioLogeado.getNombres().trim() + " " + usuarioLogeado.getApellidos().trim();
+        int idUsuario = 0;
+        
+        try {
+            String identificador = usuarioLogeado.getPassword().getIdentificador();
+            idUsuario = obtenerIdUsuarioNumerico(identificador);
+        } catch (Exception e) {
+            System.err.println("Error al obtener el ID numérico del usuario: " + e.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error al cargar datos de usuario desde la BD.", "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 1. Configuración de la interfaz para todos los roles: Cargo y Nombre fijo y deshabilitado
+        vista.getCbCargo().removeAllItems();
+        vista.getCbCargo().addItem(cargo);
+        vista.getCbCargo().setSelectedItem(cargo);
+        vista.getCbCargo().setEnabled(false); 
+
         vista.getCbNombre().removeAllItems();
-        vista.getCbNombre().addItem(SELECCIONE_ITEM + "Nombre");
+        vista.getCbNombre().addItem(nombreCompleto);
+        vista.getCbNombre().setSelectedItem(nombreCompleto);
+        vista.getCbNombre().setEnabled(false); 
         
-        // Reinicia N° Ticket
-        vista.getCbNTicket().removeAllItems();
-        vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
-        
-        limpiarDetalleCampos();
+        // 2. Carga directa de tickets y adaptación de botones según el rol
+        if ("Cliente".equalsIgnoreCase(cargo)) {
+            // CLIENTE: Solo puede cancelar.
+            vista.getTxtNivelPrioridad().setVisible(false);
+            vista.getLblNivelPrioridad().setVisible(false);
+            vista.getCbEstadoSolicitud().setEnabled(false);
+            vista.getBtnActualizarSolicitud().setVisible(false);
+            vista.getBtnCancelarSolicitud().setVisible(true);
+            
+            // Carga los tickets que él creó
+            cargarTicketsSegunRol(idUsuario, cargo);
+
+        } else if ("Programador".equalsIgnoreCase(cargo) || "Tecnico".equalsIgnoreCase(cargo) || "Técnico".equalsIgnoreCase(cargo)) {
+            // SOPORTE (Programador/Técnico): Pueden actualizar el estado.
+            vista.getTxtNivelPrioridad().setVisible(true);
+            vista.getLblNivelPrioridad().setVisible(true);
+            vista.getCbEstadoSolicitud().setEnabled(true);
+            vista.getBtnActualizarSolicitud().setVisible(true);
+            vista.getBtnCancelarSolicitud().setVisible(false);
+            
+            // Carga los tickets que están asignados a él
+            cargarTicketsSegunRol(idUsuario, cargo);
+        }
     }
+    // FIN MÉTODO CORREGIDO
 
     private void cargarDatosIniciales() {
-        cargarCargosEnVista();
         cargarListaTodosLosEstados();
-        resetearCombosSecundarios();
 
-        if (vista.getCbCargo().getItemCount() > 0) {
-            vista.getCbCargo().setSelectedIndex(0);
-        }
+        // Inicializar los combos de selección vacíos
+        // Solo aplica si el rol tuviera el combo habilitado (lo cual ya se corrigió para que no ocurra)
+        vista.getCbNTicket().removeAllItems();
+        vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
+
         limpiarDetalleCampos();
     }
-
-    private void cargarCargosEnVista() {
+    
+    // Método ya no se usa, pero se mantiene por si se quiere un administrador que vea todos los cargos
+    private void cargarCargosParaSoporte() {
         try {
-            List<TipoUsuario> cargos = obtenerCargos();
+            List<String> cargos = obtenerTiposUsuarioParaCargos();
             JComboBox<String> cb = vista.getCbCargo();
             cb.removeAllItems();
             cb.addItem(SELECCIONE_ITEM + "Cargo");
-            for (TipoUsuario tu : cargos) {
-                cb.addItem(tu.toString().trim());
+            
+            for (String c : cargos) {
+                if ("Cliente".equalsIgnoreCase(c) || "Programador".equalsIgnoreCase(c) || "Tecnico".equalsIgnoreCase(c) || "Técnico".equalsIgnoreCase(c)) {
+                    cb.addItem(c.trim());
+                }
             }
-        } catch (Exception ex) {
-            // El propio método obtenerCargos ya notifica error BD.
-            System.err.println("Error al cargar Cargos en vista: " + ex.getMessage());
+        } catch (SQLException ex) {
+            System.err.println("Error al cargar Cargos: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error al cargar los cargos desde la BD.", "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
         }
     }
     
     private void cargarListaTodosLosEstados() {
         try {
-            listaTodosLosEstados = obtenerEstadosSolicitud(); 
+            listaTodosLosEstados = obtenerEstadosSolicitud();
         } catch (Exception ex) {
             System.err.println("Error al cargar Lista de Estados: " + ex.getMessage());
             listaTodosLosEstados = new ArrayList<>();
         }
     }
 
-    private void limpiarDetalleCampos() {
-        vista.getTxtFechaCreacion().setText("");
-        vista.getTxtTipoServicio().setText("");
-        vista.getTxtDescripcion().setText("");
-        vista.getTxtNivelPrioridad().setText("");
-        vista.getCbEstadoSolicitud().removeAllItems();
-        solicitudActual = null;
-    }
-
-    // ------------------- Manejo de Eventos -------------------
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == vista.getCbCargo()) {
-            manejarSeleccionCargo();
-        } else if (e.getSource() == vista.getCbNombre()) {
-            manejarSeleccionNombre();
-        } else if (e.getSource() == vista.getCbNTicket()) {
-            manejarSeleccionTicket();
-        } else if (e.getSource() == vista.getBtnActualizarSolicitud()) {
-            manejarBotonActualizar();
-        }
-    }
-
-    private void manejarSeleccionCargo() {
-        String cargoSeleccionado = (String) vista.getCbCargo().getSelectedItem();
-
-        if (cargoSeleccionado == null || cargoSeleccionado.equals(SELECCIONE_ITEM + "Cargo")) {
-            resetearCombosSecundarios();
-            return;
-        }
-
+    private void cargarTicketsSegunRol(int idUsuario, String cargo) {
+        if (idUsuario == 0) return;
+        
         try {
-            List<Usuario> usuarios = obtenerUsuariosPorCargo(cargoSeleccionado.trim()); 
-            JComboBox<String> cb = vista.getCbNombre();
-            
-            // Reemplazamos removeAllItems y addItem(Seleccione) para no interferir con el listener
-            cb.removeAllItems();
-            cb.addItem(SELECCIONE_ITEM + "Nombre");
-
-            for (Usuario u : usuarios) {
-                // Asumiendo que u.toString() retorna Nombre y Apellido
-                cb.addItem(u.getNombres().trim() + " " + u.getApellidos().trim()); 
-            }
-            
-            // Forzamos el reinicio de los tickets y campos de detalle
-            vista.getCbNTicket().removeAllItems();
-            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
-            limpiarDetalleCampos();
-            
-        } catch (SQLException ex) {
-            System.err.println("Error al cargar Nombres: " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista, "Error al cargar los usuarios: " + ex.getMessage(), 
-                                          "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
-            resetearCombosSecundarios();
-        }
-    }
-
-    private void manejarSeleccionNombre() {
-        String nombreCompletoSeleccionado = (String) vista.getCbNombre().getSelectedItem();
-        String cargo = (String) vista.getCbCargo().getSelectedItem();
-
-        if (nombreCompletoSeleccionado == null || nombreCompletoSeleccionado.equals(SELECCIONE_ITEM + "Nombre")) {
-            vista.getCbNTicket().removeAllItems();
-            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
-            limpiarDetalleCampos();
-            return;
-        }
-
-        try {
-            int idUsuario = obtenerIdUsuarioPorNombre(nombreCompletoSeleccionado.trim());
-
-            if (idUsuario == 0) {
-                vista.getCbNTicket().removeAllItems();
-                vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
-                limpiarDetalleCampos();
-                return;
-            }
-
             List<Solicitud> solicitudes;
-            String cargoTrim = cargo.trim();
 
-            // Lógica para determinar si se buscan tickets creados (Cliente) o asignados (Soporte/Tecnico)
-            if ("Programador".equalsIgnoreCase(cargoTrim) || "Tecnico".equalsIgnoreCase(cargoTrim) || "Técnico".equalsIgnoreCase(cargoTrim)) {
+            if ("Programador".equalsIgnoreCase(cargo) || "Tecnico".equalsIgnoreCase(cargo) || "Técnico".equalsIgnoreCase(cargo)) {
+                // Soporte ve tickets asignados a su ID
                 solicitudes = obtenerSolicitudesAsignadasPorId(idUsuario);
-            } else {
-                // Asume que todos los demás roles solo ven los tickets que crearon (Clientes)
+            } else if ("Cliente".equalsIgnoreCase(cargo)) {
+                // Cliente ve tickets creados por su ID
                 solicitudes = obtenerSolicitudesPorUsuarioId(idUsuario);
+            } else {
+                return;
             }
 
             JComboBox<String> cb = vista.getCbNTicket();
@@ -200,16 +185,99 @@ public class SeguimientoSolicitudController implements ActionListener {
             for (Solicitud s : solicitudes) {
                 cb.addItem(s.getTicket().getNumeroTicket().trim());
             }
-            limpiarDetalleCampos();
         } catch (SQLException ex) {
             System.err.println("Error al cargar Tickets: " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista, "Error al cargar los tickets del usuario: " + ex.getMessage(), 
-                                          "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
-            vista.getCbNTicket().removeAllItems();
-            vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
-            limpiarDetalleCampos();
+            JOptionPane.showMessageDialog(vista, "Error al cargar los tickets desde la BD.", "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void limpiarDetalleCampos() {
+        vista.getTxtFechaCreacion().setText("");
+        vista.getTxtTipoServicio().setText("");
+        vista.getTxtDescripcion().setText("");
+        vista.getTxtNivelPrioridad().setText(""); 
+        vista.getCbEstadoSolicitud().removeAllItems();
+        solicitudActual = null;
+    }
+
+    // ------------------- Manejo de Eventos -------------------
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // Los eventos de CbCargo y CbNombre ya no deberían ocurrir si están deshabilitados
+        if (e.getSource() == vista.getCbCargo()) {
+            manejarSeleccionCargo();
+        } else if (e.getSource() == vista.getCbNombre()) {
+            manejarSeleccionNombre();
+        } else if (e.getSource() == vista.getCbNTicket()) {
+            manejarSeleccionTicket();
+        } else if (e.getSource() == vista.getBtnActualizarSolicitud()) {
+            manejarBotonActualizar(); 
+        } else if (e.getSource() == vista.getBtnCancelarSolicitud()) { 
+            cancelarSolicitudDesdeVista(); 
+        }
+    }
+    
+    // Métodos para los combos que ahora están deshabilitados
+    private void manejarSeleccionCargo() {
+        // Implementación anterior, ahora solo se usa si se habilitan los combos de nuevo
+        String cargoSeleccionado = (String) vista.getCbCargo().getSelectedItem();
+        JComboBox<String> cbNombre = vista.getCbNombre();
+        
+        cbNombre.removeAllItems();
+        vista.getCbNTicket().removeAllItems();
+        vista.getCbNTicket().addItem(SELECCIONE_ITEM + "Ticket");
+        limpiarDetalleCampos();
+
+        if (cargoSeleccionado == null || cargoSeleccionado.equals(SELECCIONE_ITEM + "Cargo")) {
+            cbNombre.addItem(SELECCIONE_ITEM + "Nombre");
+            return;
+        }
+
+        try {
+            List<Usuario> usuarios = obtenerUsuariosPorTipo(cargoSeleccionado.trim());
+            cbNombre.addItem(SELECCIONE_ITEM + "Nombre");
+            
+            for (Usuario u : usuarios) {
+                String nombreCompleto = u.getNombres().trim() + " " + u.getApellidos().trim();
+                cbNombre.addItem(nombreCompleto);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error al cargar Nombres por Cargo: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error al cargar los nombres desde la BD.", "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void manejarSeleccionNombre() {
+        // Implementación anterior, ahora solo se usa si se habilitan los combos de nuevo
+        String cargoSeleccionado = (String) vista.getCbCargo().getSelectedItem();
+        String nombreSeleccionado = (String) vista.getCbNombre().getSelectedItem();
+        JComboBox<String> cbTicket = vista.getCbNTicket();
+        
+        cbTicket.removeAllItems();
+        limpiarDetalleCampos();
+
+        if (nombreSeleccionado == null || nombreSeleccionado.equals(SELECCIONE_ITEM + "Nombre")) {
+            cbTicket.addItem(SELECCIONE_ITEM + "Ticket");
+            return;
+        }
+
+        try {
+            int idUsuarioSeleccionado = obtenerIdUsuarioPorNombreCompleto(nombreSeleccionado);
+            if (idUsuarioSeleccionado == 0) {
+                JOptionPane.showMessageDialog(vista, "Error: No se encontró el ID del usuario seleccionado.", "Error Interno", JOptionPane.ERROR_MESSAGE);
+                cbTicket.addItem(SELECCIONE_ITEM + "Ticket");
+                return;
+            }
+            
+            // Cargar tickets según el ID y el rol seleccionado
+            cargarTicketsSegunRol(idUsuarioSeleccionado, cargoSeleccionado);
+            
+        } catch (SQLException ex) {
+            System.err.println("Error al cargar Tickets por Nombre: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error al cargar los tickets para el usuario seleccionado.", "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     private void manejarSeleccionTicket() {
         String numeroTicket = (String) vista.getCbNTicket().getSelectedItem();
@@ -227,7 +295,13 @@ public class SeguimientoSolicitudController implements ActionListener {
                 vista.getTxtFechaCreacion().setText(fechaCreacion != null ? dateFormat.format(fechaCreacion) : "");
                 vista.getTxtTipoServicio().setText(solicitudActual.getTipoServicio().getNombreServicio().trim());
                 vista.getTxtDescripcion().setText(solicitudActual.getDescripcion().trim());
-                vista.getTxtNivelPrioridad().setText(solicitudActual.getTicket().getEstadoTicket().getNivelPrioridad().trim());
+                
+                if (vista.getTxtNivelPrioridad().isVisible()) {
+                    vista.getTxtNivelPrioridad().setText(solicitudActual.getTicket().getEstadoTicket().getNivelPrioridad().trim());
+                } else {
+                    vista.getTxtNivelPrioridad().setText("");
+                }
+                
                 llenarYCargarEstadoSolicitud(solicitudActual.getEstadoSolicitud().getEstadoSolicitud().trim());
             } else {
                 limpiarDetalleCampos();
@@ -254,12 +328,22 @@ public class SeguimientoSolicitudController implements ActionListener {
     }
 
     // ----------------------------------------------------------------------
-    // MANEJADOR DEL BOTÓN ACTUALIZAR Y CANCELAR (Lógica de la UI)
+    // MANEJADOR DEL BOTÓN ACTUALIZAR Y CANCELAR (Lógica de la UI) - ¡PÚBLICOS!
     // ----------------------------------------------------------------------
     
+    /**
+     * Maneja el evento de actualización de estado para el personal de soporte.
+     * Debe ser PUBLIC para ser llamado desde la Vista.
+     */
     public void manejarBotonActualizar() {
         if (solicitudActual == null) {
             JOptionPane.showMessageDialog(vista, "Seleccione un ticket para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String cargo = SesionActual.usuarioActual.getTipoUsuario().getCargo().trim();
+        if ("Cliente".equalsIgnoreCase(cargo)) {
+            JOptionPane.showMessageDialog(vista, "Los Clientes solo pueden cancelar una solicitud, no actualizarla.", "Permiso Denegado", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -272,11 +356,28 @@ public class SeguimientoSolicitudController implements ActionListener {
         ejecutarActualizacion(nuevoEstadoStr);
     }
     
+    /**
+     * Maneja el evento de cancelación de solicitud para el cliente.
+     * Debe ser PUBLIC para ser llamado desde la Vista.
+     */
     public void cancelarSolicitudDesdeVista() {
         if (solicitudActual == null) {
             JOptionPane.showMessageDialog(vista, "Seleccione un ticket para cancelar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
+        String estadoActual = solicitudActual.getEstadoSolicitud().getEstadoSolicitud().trim();
+        if (ESTADO_CANCELADO_NOMBRE.equalsIgnoreCase(estadoActual) || "Finalizado".equalsIgnoreCase(estadoActual) || "Cerrado".equalsIgnoreCase(estadoActual)) {
+              JOptionPane.showMessageDialog(vista, "Esta solicitud ya está en estado '" + estadoActual + "' y no se puede cancelar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+              return;
+        }
+        
+        String cargo = SesionActual.usuarioActual.getTipoUsuario().getCargo().trim();
+        if (!"Cliente".equalsIgnoreCase(cargo)) {
+              JOptionPane.showMessageDialog(vista, "Solo el cliente puede cancelar su solicitud.", "Permiso Denegado", JOptionPane.ERROR_MESSAGE);
+              return;
+        }
+
 
         int confirmacion = JOptionPane.showConfirmDialog(vista, 
                 "¿Está seguro que desea CANCELAR la solicitud #" + solicitudActual.getTicket().getNumeroTicket() + "?",
@@ -308,10 +409,11 @@ public class SeguimientoSolicitudController implements ActionListener {
 
             if (exito) {
                 JOptionPane.showMessageDialog(vista,
-                                "El estado de la solicitud #" + ticketNum + " ha sido actualizado a: " + nuevoEstadoStr,
-                                "Actualización Exitosa",
-                                JOptionPane.INFORMATION_MESSAGE);
+                                 "El estado de la solicitud #" + ticketNum + " ha sido actualizado a: " + nuevoEstadoStr,
+                                 "Actualización Exitosa",
+                                 JOptionPane.INFORMATION_MESSAGE);
                 cargarDatosIniciales();
+                adaptarVistaSegunRol(); 
             } else {
                 JOptionPane.showMessageDialog(vista, "Fallo al actualizar el estado en la base de datos.", "Error de BD", JOptionPane.ERROR_MESSAGE);
             }
@@ -320,13 +422,22 @@ public class SeguimientoSolicitudController implements ActionListener {
         }
     }
 
-    // --- Métodos de Navegación ---
+    // --- Métodos de Navegación --- - ¡PÚBLICOS!
+
+    /**
+     * Muestra la vista.
+     * Debe ser PUBLIC para ser llamado desde los JFrames de menú.
+     */
     public void iniciar() {
         vista.setVisible(true);
         vista.setTitle("Seguimiento y Actualización de Solicitudes");
         vista.setLocationRelativeTo(null);
     }
 
+    /**
+     * Cierra la vista actual y regresa a la ventana de origen.
+     * Debe ser PUBLIC para ser llamado desde la Vista.
+     */
     public void irAtras() {
         vista.dispose();
         if (ventanaOrigen != null) {
@@ -338,31 +449,33 @@ public class SeguimientoSolicitudController implements ActionListener {
     }
     
     // ----------------------------------------------------------------------
-    // --- MÉTODOS DE ACCESO A DATOS (DAO) - MOVIDOS Y COMPLETOS ---
+    // --- MÉTODOS DE ACCESO A DATOS (DAO)
     // ----------------------------------------------------------------------
     
-    // --- Carga Inicial ---
-    private List<TipoUsuario> obtenerCargos() throws SQLException {
-        List<TipoUsuario> cargos = new ArrayList<>();
-        String sql = "SELECT cargo FROM TIPO_USUARIO";
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                TipoUsuario tu = new TipoUsuario();
-                tu.setCargo(rs.getString("cargo").trim());
-                cargos.add(tu);
+    /**
+     * Resuelve el ID numérico de la base de datos a partir del identificador de texto.
+     */
+    private int obtenerIdUsuarioNumerico(String identificador) throws SQLException {
+        int idUsuario = 0;
+        String sql = "SELECT u.IDUSUARIO FROM USUARIO u JOIN PASWORD p ON u.IDPASWORD = p.IDPASWORD WHERE LOWER(TRIM(p.IDENTIFICADOR)) = LOWER(TRIM(?))";
+        try (Connection conn = ConexionBD.conectar(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, identificador);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    idUsuario = rs.getInt("IDUSUARIO");
+                }
             }
-        } catch (SQLException ex) {
-            System.err.println("Error SQL al cargar Cargos: " + ex.getMessage());
-            JOptionPane.showMessageDialog(vista, "Error al cargar los cargos desde la BD.", "Error de Conexión/BD", JOptionPane.ERROR_MESSAGE);
-            throw ex;
         }
-        return cargos;
+        return idUsuario;
     }
     
     private List<EstadoSolicitud> obtenerEstadosSolicitud() throws SQLException {
         List<EstadoSolicitud> estados = new ArrayList<>();
         String sql = "SELECT estadosolicitud FROM ESTADO_SOLICITUD";
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+        try (Connection conn = ConexionBD.conectar(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql); 
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 EstadoSolicitud es = new EstadoSolicitud();
                 es.setEstadoSolicitud(rs.getString("estadosolicitud").trim());
@@ -370,13 +483,12 @@ public class SeguimientoSolicitudController implements ActionListener {
             }
         } catch (SQLException ex) {
             System.err.println("Error SQL al cargar Estados: " + ex.getMessage());
-             JOptionPane.showMessageDialog(vista, "Error al cargar los estados de solicitud desde la BD.", "Error de Conexión/BD", JOptionPane.ERROR_MESSAGE);
-             throw ex;
+            JOptionPane.showMessageDialog(vista, "Error al cargar los estados de solicitud desde la BD.", "Error de Conexión/BD", JOptionPane.ERROR_MESSAGE);
+            throw ex;
         }
         return estados;
     }
     
-    // --- Búsqueda de IDs (Críticos para el flujo) ---
     private int obtenerIdEstadoPorNombre(String estadoNombre) throws SQLException {
         int idEstado = 0;
         String sql = "SELECT idestadosolicitud FROM ESTADO_SOLICITUD WHERE LOWER(TRIM(estadosolicitud)) = LOWER(TRIM(?))";
@@ -405,56 +517,9 @@ public class SeguimientoSolicitudController implements ActionListener {
         return idSolicitud;
     }
     
-    private int obtenerIdUsuarioPorNombre(String nombreCompleto) throws SQLException {
-        String[] partes = nombreCompleto.trim().split(" ", 2);
-        if (partes.length < 2) {
-            return 0;
-        }
-
-        String nombres = partes[0];
-        String apellidos = partes[1];
-        int idUsuario = 0;
-
-        String sql = "SELECT idusuario FROM USUARIO "
-                + "WHERE LOWER(TRIM(nombres)) = LOWER(TRIM(?)) "
-                + "AND LOWER(TRIM(apellidos)) = LOWER(TRIM(?))";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, nombres);
-            pstmt.setString(2, apellidos);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    idUsuario = rs.getInt("idusuario");
-                }
-            }
-        }
-        return idUsuario;
-    }
-
-    // --- Búsqueda de Usuarios y Solicitudes ---
-    private List<Usuario> obtenerUsuariosPorCargo(String cargo) throws SQLException {
-        List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT u.nombres, u.apellidos, u.correoelectronico FROM USUARIO u "
-                + "JOIN TIPO_USUARIO tu ON u.idtipousuario = tu.idtipousuario "
-                + "WHERE LOWER(TRIM(tu.cargo)) = LOWER(TRIM(?)) "
-                + "ORDER BY u.apellidos";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, cargo);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Usuario u = new Usuario();
-                    u.setNombres(rs.getString("nombres").trim());
-                    u.setApellidos(rs.getString("apellidos").trim());
-                    u.setCorreoElectronico(rs.getString("correoelectronico").trim());
-                    usuarios.add(u);
-                }
-            }
-        }
-        return usuarios;
-    }
-
+    /**
+     * Obtiene solicitudes creadas por un ID de Usuario (usado para Cliente).
+     */
     private List<Solicitud> obtenerSolicitudesPorUsuarioId(int idUsuario) throws SQLException {
         List<Solicitud> solicitudes = new ArrayList<>();
         String sql = "SELECT s.idsolicitud, s.idestadosolicitud, s.idtiposervicio, s.idticket, s.fechacreacion, s.descripcion, "
@@ -464,7 +529,8 @@ public class SeguimientoSolicitudController implements ActionListener {
                 + "JOIN ESTADO_TICKET et ON t.idestadoticket = et.idestadoticket "
                 + "JOIN TIPO_SERVICIO ts ON s.idtiposervicio = ts.idtiposervicio "
                 + "JOIN ESTADO_SOLICITUD es ON s.idestadosolicitud = es.idestadosolicitud "
-                + "WHERE s.idusuario = ?";
+                + "WHERE s.idusuario = ? AND es.estadosolicitud NOT IN ('Cancelado', 'Finalizado')"; 
+        
 
         try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idUsuario);
@@ -477,6 +543,9 @@ public class SeguimientoSolicitudController implements ActionListener {
         return solicitudes;
     }
 
+    /**
+     * Obtiene solicitudes asignadas a un ID de Usuario (usado para Soporte: Programador/Técnico).
+     */
     private List<Solicitud> obtenerSolicitudesAsignadasPorId(int idUsuario) throws SQLException {
         List<Solicitud> solicitudes = new ArrayList<>();
         String sql = "SELECT s.idsolicitud, s.idestadosolicitud, s.idtiposervicio, s.idticket, s.fechacreacion, s.descripcion, "
@@ -486,7 +555,8 @@ public class SeguimientoSolicitudController implements ActionListener {
                 + "JOIN ESTADO_TICKET et ON t.idestadoticket = et.idestadoticket "
                 + "JOIN TIPO_SERVICIO ts ON s.idtiposervicio = ts.idtiposervicio "
                 + "JOIN ESTADO_SOLICITUD es ON s.idestadosolicitud = es.idestadosolicitud "
-                + "WHERE t.idusuario = ?";
+                + "WHERE t.idusuario = ? AND es.estadosolicitud NOT IN ('Cancelado', 'Finalizado')"; 
+        
 
         try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idUsuario);
@@ -520,7 +590,7 @@ public class SeguimientoSolicitudController implements ActionListener {
         }
         return solicitud;
     }
-
+    
     // --- Mapeo de Entidad ---
     private Solicitud crearObjetoSolicitud(ResultSet rs) throws SQLException {
         Solicitud s = new Solicitud();
@@ -562,5 +632,64 @@ public class SeguimientoSolicitudController implements ActionListener {
             System.err.println("Error de SQL al actualizar el estado de la solicitud: " + e.getMessage());
             throw new Exception("Error en la Base de Datos al actualizar solicitud. Detalles: " + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * Obtiene todos los cargos de la tabla TIPO_USUARIO.
+     */
+    private List<String> obtenerTiposUsuarioParaCargos() throws SQLException {
+        List<String> cargos = new ArrayList<>();
+        String sql = "SELECT DISTINCT cargo FROM TIPO_USUARIO ORDER BY cargo";
+        try (Connection conn = ConexionBD.conectar(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql); 
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                cargos.add(rs.getString("cargo").trim());
+            }
+        }
+        return cargos;
+    }
+    
+    /**
+     * Obtiene la lista de usuarios (nombre y apellido) para un cargo específico.
+     */
+    private List<Usuario> obtenerUsuariosPorTipo(String cargo) throws SQLException {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT u.nombres, u.apellidos FROM USUARIO u JOIN TIPO_USUARIO tu ON u.idtipousuario = tu.idtipousuario WHERE LOWER(TRIM(tu.cargo)) = LOWER(TRIM(?)) ORDER BY u.nombres";
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, cargo);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setNombres(rs.getString("nombres"));
+                    u.setApellidos(rs.getString("apellidos"));
+                    usuarios.add(u);
+                }
+            }
+        }
+        return usuarios;
+    }
+    
+    /**
+     * Resuelve el ID del usuario buscando por su nombre completo.
+     */
+    private int obtenerIdUsuarioPorNombreCompleto(String nombreCompleto) throws SQLException {
+        int idUsuario = 0;
+        // Se asume que el nombre completo viene como "Nombre Apellido"
+        String[] partes = nombreCompleto.split(" ", 2); 
+        if (partes.length < 2) return 0; 
+
+        String sql = "SELECT idusuario FROM USUARIO WHERE LOWER(TRIM(nombres)) = LOWER(TRIM(?)) AND LOWER(TRIM(apellidos)) = LOWER(TRIM(?))";
+        
+        try (Connection conn = ConexionBD.conectar(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, partes[0].trim());
+            pstmt.setString(2, partes[1].trim());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    idUsuario = rs.getInt("idusuario");
+                }
+            }
+        }
+        return idUsuario;
     }
 }

@@ -1,14 +1,16 @@
 package capa_vista;
 
-import capa_vista.jFrameMenuTecnico;
 import capa_controladora.SeguimientoSolicitudController;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 /**
+ * Vista para el seguimiento y actualización de solicitudes. Contiene JTextField
+ * para Cargo y Nombre.
  *
  * @author RYZEN
  */
@@ -21,24 +23,10 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
 
-    // --- GETTERS PARA COMBOBOXES ---
-    public javax.swing.JComboBox<String> getCbCargo() {
-        return cbCargo;
-    }
+    // ----------------------------------------------------------------------
+    // --- GETTERS CORRECTOS PARA CAMPOS DE TEXTO (TXT) ---
+    // ----------------------------------------------------------------------
 
-    public javax.swing.JComboBox<String> getCbNombre() {
-        return cbNombre;
-    }
-
-    public javax.swing.JComboBox<String> getCbNTicket() {
-        return cbNTicket;
-    }
-
-    public javax.swing.JComboBox<String> getCbEstadoSolicitud() {
-        return cbEstadoSolicitud;
-    }
-
-    // --- GETTERS PARA CAMPOS DE TEXTO ---
     public javax.swing.JTextField getTxtFechaCreacion() {
         return txtFechaCreacion;
     }
@@ -55,9 +43,44 @@ public class jFrameSeguimientoSolicitud extends javax.swing.JFrame {
         return txtNivelPrioridad;
     }
 
-    // --- GETTER PARA BOTÓN (Necesario para añadir el ActionListener en el Controller) ---
+    // ----------------------------------------------------------------------
+    // --- GETTERS PARA COMBOBOXES (CB) ---
+    // ----------------------------------------------------------------------
+     public javax.swing.JComboBox<String> getCbNombre() {
+        return cbNombre;
+    }
+      public javax.swing.JComboBox<String> getCbCargo() {
+        return cbCargo;
+    }
+    public javax.swing.JComboBox<String> getCbNTicket() {
+        return cbNTicket;
+    }
+
+    public javax.swing.JComboBox<String> getCbEstadoSolicitud() {
+        return cbEstadoSolicitud;
+    }
+
+    // ----------------------------------------------------------------------
+    // --- GETTERS PARA BOTONES Y ETIQUETAS (LABELS) ---
+    // ----------------------------------------------------------------------
     public javax.swing.JButton getBtnActualizarSolicitud() {
         return btnActualizarSolicitud;
+    }
+
+    public javax.swing.JButton getBtnCancelarSolicitud() {
+        return btnCancelarSolicitud;
+    }
+
+    public javax.swing.JLabel getLblCargo() {
+        return lblCargo;
+    }
+
+    public javax.swing.JLabel getLblNombre() {
+        return lblNombre;
+    }
+
+    public javax.swing.JLabel getLblNivelPrioridad() {
+        return lblNivelPrioridad;
     }
 
     // --- SETTER para inyectar el Controller ---

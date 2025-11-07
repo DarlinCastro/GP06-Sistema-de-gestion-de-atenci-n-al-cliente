@@ -29,7 +29,7 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
     public jFrameCrearSolicitud() {
         initComponents(); 
         this.setLocationRelativeTo(null);
-        
+        txtTicket.setEditable(false);     
         //Para poner la fecha automaticamente
         String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         txtFechaCreacion.setText(fechaActual);
@@ -42,9 +42,9 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
      
      public jFrameCrearSolicitud(Usuario usuarioSesion, int idUsuario) {
         initComponents();
-        this.usuario = usuarioSesion; // ✅ INICIALIZACIÓN CORRECTA de la sesión
+        this.usuario = usuarioSesion; 
         this.idUsuario = idUsuario; 
-        
+        txtTicket.setEditable(false);  
         // Inicialización de fecha
         String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         txtFechaCreacion.setText(fechaActual);
@@ -91,7 +91,6 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
             }
         });
 
-        txtTicket.setEditable(false);
         txtTicket.setBackground(new java.awt.Color(204, 204, 204));
 
         txtFechaCreacion.setBackground(new java.awt.Color(204, 204, 204));
@@ -100,7 +99,7 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
 
         jLabel1.setText("Fecha Creación : ");
 
-        cbTipoServicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Instalación y configuración de equipos informáticos", "Mantenimiento preventivo y correctivo de hardware", "Diagnóstico y reparación de fallos en equipos", "Soporte de Conectividad", "Instalación, configurción y actualización de software interno", "Recuperación de acceso" }));
+        cbTipoServicio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Instalación y configuración de equipos informáticos", "Mantenimiento preventivo y correctivo de hardware", "Diagnóstico y reparación de fallos en equipos", "Soporte de Conectividad", "Instalación, configuración y actualización de software interno", "Recuperación de acceso" }));
 
         jLabel2.setText("Tipo de Servicio :");
 
@@ -198,7 +197,7 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cbTipoServicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtFechaCreacion, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(147, Short.MAX_VALUE))
+                .addContainerGap(141, Short.MAX_VALUE))
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
@@ -281,6 +280,7 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
         if (numeroTicketGenerado != null) {
             JOptionPane.showMessageDialog(this, "✅ Solicitud creada con éxito.");
             txtTicket.setText(numeroTicketGenerado); 
+            limpiarCampos();
             txtDescripcion.setText("");
         } else {
             JOptionPane.showMessageDialog(this, "❌ Error al crear la solicitud. Usuario o servicio no válido.");
@@ -297,7 +297,7 @@ public class jFrameCrearSolicitud extends javax.swing.JFrame {
     public void limpiarCampos() {
         txtDescripcion.setText("");  // Limpia el campo de descripción
         cbTipoServicio.setSelectedIndex(0);  // Opcional: Restablece el combo box
-        // No limpies txtTicket ni txtFechaCreacion, ya que son no editables
+        txtTicket.setText("");
     }
     /**
      * @param args the command line arguments

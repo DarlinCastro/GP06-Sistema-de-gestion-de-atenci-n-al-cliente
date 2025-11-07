@@ -8,8 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 
@@ -39,9 +37,11 @@ public class CrearSolicitudController {
      * @return El ID del tipo de servicio o -1 si no se encuentra o hay un error.
      */
     private int obtenerIdTipoServicioPorNombre(String nombreServicio) {
-        String sql = "SELECT idtiposervicio FROM tipo_servicio WHERE nombreservicio = ?";
+        // ✅ CORRECCIÓN CLAVE: Usamos LOWER(TRIM(nombreservicio)) para ignorar espacios de CHAR(80) y mayúsculas/minúsculas.
+        String sql = "SELECT idtiposervicio FROM tipo_servicio WHERE LOWER(TRIM(nombreservicio)) = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, nombreServicio.trim());
+            // Convertimos el String de Java a minúsculas
+            stmt.setString(1, nombreServicio.trim().toLowerCase());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) return rs.getInt("idtiposervicio");
         } catch (SQLException e) {
@@ -56,9 +56,10 @@ public class CrearSolicitudController {
      * @return El ID del estado o -1 si no se encuentra o hay un error.
      */
     private int obtenerIdEstadoSolicitudPorNombre(String nombreEstado) {
-        String sql = "SELECT idestadosolicitud FROM estado_solicitud WHERE estadosolicitud = ?";
+        // Aplicamos la corrección por ser columna CHAR(10)
+        String sql = "SELECT idestadosolicitud FROM estado_solicitud WHERE LOWER(TRIM(estadosolicitud)) = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, nombreEstado.trim());
+            stmt.setString(1, nombreEstado.trim().toLowerCase());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) return rs.getInt("idestadosolicitud");
         } catch (SQLException e) {
@@ -73,9 +74,10 @@ public class CrearSolicitudController {
      * @return El ID del usuario o -1 si no se encuentra o hay un error.
      */
     private int obtenerIdUsuarioPorCorreo(String correo) {
-        String sql = "SELECT idusuario FROM usuario WHERE correoelectronico = ?";
+        // Aplicamos la corrección por ser columna CHAR(25)
+        String sql = "SELECT idusuario FROM usuario WHERE LOWER(TRIM(correoelectronico)) = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, correo.trim());
+            stmt.setString(1, correo.trim().toLowerCase());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) return rs.getInt("idusuario");
         } catch (SQLException e) {
@@ -106,7 +108,7 @@ public class CrearSolicitudController {
      * @return El ID generado para el nuevo ticket (idticket) o -1 si hay un error.
      */
     private int crearTicket(int idUsuario, String numeroTicket) {
-        // Asumiendo PostgreSQL (ajustar si usas MySQL/otra BD si no soporta RETURNING)
+        // Usando RETURNING para obtener el ID del ticket
         String sql = "INSERT INTO ticket (idestadoticket, idusuario, fechaasignacion, numeroticket) VALUES (?, ?, ?, ?) RETURNING idticket";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, 1); // ID 1 = Estado inicial de ticket (Ej: Abierto/Nuevo)
@@ -127,7 +129,6 @@ public class CrearSolicitudController {
      * @return true si se guardó correctamente, false en caso contrario.
      */
     private boolean guardarSolicitud(Solicitud solicitud, int idUsuario, int idTipoServicio, int idEstadoSolicitud, int idTicket) {
-        // Usando los nombres de columna de tu esquema (ej: fechacreacion)
         String sql = "INSERT INTO solicitud (idusuario, idtiposervicio, idestadosolicitud, idticket, fechacreacion, descripcion) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idUsuario);
@@ -135,13 +136,12 @@ public class CrearSolicitudController {
             stmt.setInt(3, idEstadoSolicitud);
             stmt.setInt(4, idTicket);
             
-            // Usamos el getter de tu Entidad Solicitud
             stmt.setDate(5, new java.sql.Date(solicitud.getFechaCreacion().getTime()));
 
             String descripcion = solicitud.getDescripcion() != null ? solicitud.getDescripcion().trim() : "";
-            // Validación de longitud (asumiendo 30 caracteres máximo en BD)
-            if (descripcion.length() > 30) {
-                descripcion = descripcion.substring(0, 30);
+            // ✅ CORRECCIÓN: Se usa 300 porque DESCRIPCION es CHAR(300) en el esquema SQL.
+            if (descripcion.length() > 300) {
+                descripcion = descripcion.substring(0, 300);
             }
             stmt.setString(6, descripcion);
 
@@ -162,15 +162,8 @@ public class CrearSolicitudController {
      * @return Un nuevo número de ticket único.
      */
     private String generarNuevoNumeroTicket() {
-        // Llama al método DAO absorbido
         int cantidadTickets = obtenerCantidadTickets();
-        // Nota: El código original usaba la cantidad total para generar el ID.
-        // Asumiendo que esta es la lógica deseada, la mantenemos.
         int nuevoId = cantidadTickets + 1;
-        
-        // El código original incluía la fecha, pero el formato final solo usaba el ID secuencial.
-        // String fechaStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        // El formato original era "T" + ID_FORMATEADO.
         
         String idFormateado = String.format("%04d", nuevoId);
 
@@ -198,7 +191,6 @@ public class CrearSolicitudController {
 
         // 2. Generar Ticket y obtener ID del BD
         String numeroTicket = generarNuevoNumeroTicket();
-        // Llama al método DAO absorbido
         int idTicket = crearTicket(idUsuario, numeroTicket);
         if (idTicket == -1) {
             return null;
@@ -208,8 +200,8 @@ public class CrearSolicitudController {
         Solicitud solicitud = new Solicitud();
         solicitud.setFechaCreacion(new Date());
 
-        // La lógica de truncado de la descripción se aplica en el controlador antes de setearla
-        String descGuardar = descripcion.length() > 30 ? descripcion.substring(0, 30) : descripcion;
+        // Se usa 300 porque DESCRIPCION es CHAR(300)
+        String descGuardar = descripcion.length() > 300 ? descripcion.substring(0, 300) : descripcion;
         solicitud.setDescripcion(descGuardar);
         
         // Creación y seteo del objeto Ticket (solo para la entidad)
@@ -223,4 +215,3 @@ public class CrearSolicitudController {
         return solicitudGuardada ? numeroTicket : null;
     }
 }
-

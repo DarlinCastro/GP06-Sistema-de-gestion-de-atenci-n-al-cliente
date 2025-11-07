@@ -43,7 +43,7 @@ public class jFrameMenuCliente extends javax.swing.JFrame {
         jPanelMenuCliente.setBackground(new java.awt.Color(255, 255, 255));
         jPanelMenuCliente.setPreferredSize(new java.awt.Dimension(640, 300));
 
-        btnCrearSolicitud.setBackground(new java.awt.Color(0, 102, 204));
+        btnCrearSolicitud.setBackground(new java.awt.Color(51, 51, 255));
         btnCrearSolicitud.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnCrearSolicitud.setForeground(new java.awt.Color(255, 255, 255));
         btnCrearSolicitud.setText("Crear Solicitud");
@@ -56,7 +56,7 @@ public class jFrameMenuCliente extends javax.swing.JFrame {
         lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblTitulo.setText("Menú Cliente");
 
-        btnAtras.setBackground(new java.awt.Color(0, 102, 204));
+        btnAtras.setBackground(new java.awt.Color(51, 51, 255));
         btnAtras.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnAtras.setForeground(new java.awt.Color(255, 255, 255));
         btnAtras.setText("Atras");
@@ -66,7 +66,7 @@ public class jFrameMenuCliente extends javax.swing.JFrame {
             }
         });
 
-        btnSeguimientoSolicitud.setBackground(new java.awt.Color(0, 102, 204));
+        btnSeguimientoSolicitud.setBackground(new java.awt.Color(51, 51, 255));
         btnSeguimientoSolicitud.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnSeguimientoSolicitud.setForeground(new java.awt.Color(255, 255, 255));
         btnSeguimientoSolicitud.setText("Seguimiento Solicitud");

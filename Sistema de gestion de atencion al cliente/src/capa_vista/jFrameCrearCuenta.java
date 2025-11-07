@@ -84,7 +84,7 @@ public class jFrameCrearCuenta extends javax.swing.JFrame {
         lblContraseña.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblContraseña.setText("Contraseña:");
 
-        btnRegistrar.setBackground(new java.awt.Color(102, 102, 255));
+        btnRegistrar.setBackground(new java.awt.Color(51, 51, 255));
         btnRegistrar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnRegistrar.setForeground(new java.awt.Color(255, 255, 255));
         btnRegistrar.setText("Registrar");
@@ -154,7 +154,7 @@ public class jFrameCrearCuenta extends javax.swing.JFrame {
                 .addGap(16, 16, 16))
         );
 
-        btnAtras.setBackground(new java.awt.Color(102, 102, 255));
+        btnAtras.setBackground(new java.awt.Color(51, 51, 255));
         btnAtras.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnAtras.setForeground(new java.awt.Color(255, 255, 255));
         btnAtras.setText("Atras");

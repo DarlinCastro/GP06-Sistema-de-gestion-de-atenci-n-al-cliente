@@ -41,7 +41,7 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
         jPanelMenuAdministrador.setBackground(new java.awt.Color(255, 255, 255));
         jPanelMenuAdministrador.setPreferredSize(new java.awt.Dimension(640, 300));
 
-        btnAtras.setBackground(new java.awt.Color(0, 102, 204));
+        btnAtras.setBackground(new java.awt.Color(51, 51, 255));
         btnAtras.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnAtras.setForeground(new java.awt.Color(255, 255, 255));
         btnAtras.setText("Atras");
@@ -55,7 +55,7 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
         lblMenuAdministrador.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblMenuAdministrador.setText("Menu Administrador");
 
-        btnAsignarSolicitudes.setBackground(new java.awt.Color(0, 102, 204));
+        btnAsignarSolicitudes.setBackground(new java.awt.Color(51, 51, 255));
         btnAsignarSolicitudes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnAsignarSolicitudes.setForeground(new java.awt.Color(255, 255, 255));
         btnAsignarSolicitudes.setText("Asignar Solicitudes");
@@ -65,7 +65,7 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
             }
         });
 
-        btnGestionarUsuarios.setBackground(new java.awt.Color(0, 102, 204));
+        btnGestionarUsuarios.setBackground(new java.awt.Color(51, 51, 255));
         btnGestionarUsuarios.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnGestionarUsuarios.setForeground(new java.awt.Color(255, 255, 255));
         btnGestionarUsuarios.setText("Gestionar Usuarios");
@@ -75,7 +75,7 @@ public class jFrameMenuAdmin extends javax.swing.JFrame {
             }
         });
 
-        btnGenerarReportes.setBackground(new java.awt.Color(0, 102, 204));
+        btnGenerarReportes.setBackground(new java.awt.Color(51, 51, 255));
         btnGenerarReportes.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnGenerarReportes.setForeground(new java.awt.Color(255, 255, 255));
         btnGenerarReportes.setText("Generar Reportes");
