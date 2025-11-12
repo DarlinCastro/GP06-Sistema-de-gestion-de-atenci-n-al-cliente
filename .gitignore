@@ -40,3 +40,4 @@ nb-configuration.xml
 /Sistema de gestion de atencion al cliente/build/
 # Ignorar archivos compilados
 dist/
+/Sistema de gestion de atencion al cliente web/build/
